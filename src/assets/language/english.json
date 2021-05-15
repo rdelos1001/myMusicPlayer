@@ -1,0 +1,19 @@
+{
+    "id":"en",
+    "songsPage":{
+        "title":"Songs",
+        "search":"Search",
+        "loadingSongs":"Importing songs ...",
+        "changeToSufflePlay":"Suffle mode activated",
+        "changeToNormalPlay":"Normal mode activated"
+    },
+    "settingsPage":{
+        "title":"Settings",
+        "version":"Version",
+        "author":"Author",
+        "language":"Language",
+        "spanish":"Spanish",
+        "english":"English",
+        "notAvailable":"Not available"
+    }
+}

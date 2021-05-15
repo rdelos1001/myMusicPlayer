@@ -1,0 +1,18 @@
+<app-header [title]="language.title" back=true></app-header>
+<ion-content>
+<ion-list>
+  <ion-item>
+    <ion-label>{{language.version}}: {{version || language.notAvailable}}</ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>{{language.author}}: Raúl De los santos Cabrera</ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>{{language.language}}:</ion-label>
+    <ion-select [(ngModel)]="languageValue" value="español" (ionChange)="setLanguage()" interface="popover" cancelText="Cancelar">
+      <ion-select-option value="sp">{{language.spanish}}</ion-select-option>
+      <ion-select-option value="en">{{language.english}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+</ion-list>
+</ion-content>

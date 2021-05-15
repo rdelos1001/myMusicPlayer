@@ -1,0 +1,34 @@
+ion-content, ion-list, ion-item,ion-toolbar{
+    --background:var(--ion-color-dark);
+    --ion-background-color:var(--ion-color-dark);
+    color:white;
+}
+
+ion-content{
+    position: relative;
+}
+ion-button{
+    --background:var(--ion-color-dark);
+    --box-shadow:none;
+}
+.modCol ion-button{
+    font-size: 10px;
+}
+#shearchInput{
+    --background:black;
+    width: 100%;
+}
+
+ion-footer{
+    --background:var(--ion-color-dark);
+    ion-toolbar{
+        ion-row{
+            margin-top: 1pc;
+        }
+        border-top: 2px solid var(--ion-color-success);
+        border-radius: 10% 10% 0 0;
+    }
+    ion-icon{
+        font-size: 35px;
+    }
+}

@@ -17,7 +17,7 @@ const { Filesystem } = Plugins;
 })
 export class SongsPage implements OnInit {
   playList:Song[]=[
-    {
+/*     {
       name:"A day to remember - It's Complicated",
        path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
@@ -28,11 +28,11 @@ export class SongsPage implements OnInit {
     {
       name:"ACDC - Thunderstruck",
        path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    }
+    } */
    ]
   toggleProgressVolume:boolean=false;
   allSongs:Song[]=[ 
-    {
+ /*    {
       name:"A day to remember - It's Complicated",
        path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
@@ -43,7 +43,7 @@ export class SongsPage implements OnInit {
     {
       name:"ACDC - Thunderstruck",
        path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    }
+    } */
    ]
   songName="";
   SDCARD_DIR=""
@@ -82,7 +82,7 @@ export class SongsPage implements OnInit {
     this._utils.presentLoading(this.language.loadingSongs);
     Filesystem.requestPermissions().then(async()=>{
       var path="/storage";
-      this.FILESYSTEM_DIR=path+"/emulated";
+      this.FILESYSTEM_DIR=path+"/emulated/0";
       var dir= await Filesystem.readdir({path});
       dir.files.forEach((el)=>{
         if(el!="self" && el!="emulated"){
@@ -101,19 +101,28 @@ export class SongsPage implements OnInit {
   }
 
   async findSongs(path:string){
-    var dir =await Filesystem.readdir({path});
-    dir.files.forEach(async(el)=>{
-      if(el.endsWith('.mp3')){
-        await Filesystem.stat({ path:path+"/" + el })
-        .then((fileInfo)=>{
-          var win: any = window;
-          fileInfo.uri=win.Ionic.WebView.convertFileSrc(fileInfo.uri);
-          this.allSongs.push({name:el.substring(0,el.lastIndexOf('.')),path:fileInfo.uri})
-        }).catch((err)=>{
-          console.error("ERROR EN FILEINFO",err);
-        });
-      }
+    Filesystem.readdir({path}).then((dir)=>{
+      dir.files.forEach(async(el)=>{
+        if(el.endsWith('.mp3')){
+          console.log(el);
+          var win:any=window;
+          let songPath=win.Ionic.WebView.convertFileSrc(path+"/"+el.replace('%',escape("%")));
+          this.allSongs.push({name:el.substring(0,el.lastIndexOf('.')),path:songPath})
+
+/*           await Filesystem.stat({ path:path+"/" + el })
+          .then((fileInfo)=>{
+            var win: any = window;
+            fileInfo.uri=win.Ionic.WebView.convertFileSrc(fileInfo.uri);
+          }).catch((err)=>{
+            console.error("ERROR EN FILEINFO",err);
+          }); */
+        }
+      })
     })
+    .catch((err)=>{
+      console.error("ERROR EN EL DIRECTORIO ",path);
+      console.error(err);
+    });
   }
 
   findByName(){

@@ -218,9 +218,10 @@ export class SongsPage implements OnInit {
       this.updateProgress()
     },500);
   }
-  changeVolume(){
-    let newVolume=this.volume/100;
-    Howler.volume(newVolume)
+  changeVolume(volume?:number){
+    let newVolume=volume==undefined?this.volume:volume;
+    this.volume=newVolume
+    Howler.volume(newVolume/100);
   }
   toggleVolumeBar(){
     this.toggleProgressVolume=!this.toggleProgressVolume

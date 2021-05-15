@@ -1,31 +1,42 @@
 ion-content, ion-list, ion-item,ion-toolbar{
-    --background:var(--ion-color-dark);
-    --ion-background-color:var(--ion-color-dark);
-    color:white;
+    --background:var(--background-color);
+    --ion-background-color:var(--background-color);
+    color:var(--text-color);
 }
 
+.activeSong{
+    color: var(--text-color-selected);
+}
+.nonActiveSong{
+    color:var(--text-color);
+}
+ion-icon{
+    color: var(--button-color);
+}
 ion-content{
     position: relative;
 }
 ion-button{
-    --background:var(--ion-color-dark);
     --box-shadow:none;
 }
 .modCol ion-button{
     font-size: 10px;
 }
 #shearchInput{
-    --background:black;
+    
+    --highlight-background:var(--decorative-color);
+    
+    --background:var(--searchInput-background);
     width: 100%;
 }
 
 ion-footer{
-    --background:var(--ion-color-dark);
+    --background:var(--background-color);
     ion-toolbar{
         ion-row{
             margin-top: 1pc;
         }
-        border-top: 2px solid var(--ion-color-success);
+        border-top: 2px solid var(--decorative-color);
         border-radius: 10% 10% 0 0;
     }
     ion-icon{

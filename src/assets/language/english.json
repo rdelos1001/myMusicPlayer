@@ -14,6 +14,10 @@
         "language":"Language",
         "spanish":"Spanish",
         "english":"English",
-        "notAvailable":"Not available"
+        "notAvailable":"Not available",
+        "theme":"Theme",
+        "themeDark":"Dark",
+        "themeLight":"Light"
+        
     }
 }

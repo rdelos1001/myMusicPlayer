@@ -24,11 +24,12 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+@import "/src/app/app.component.scss";
 
 .toast{
     --background: var(--ion-color-light-tint);
     --color: #000;
 }
-body{
-    background-color: var(--ion-color-dark);
+ion-button,ion-icon{
+    --background: transparent;
 }

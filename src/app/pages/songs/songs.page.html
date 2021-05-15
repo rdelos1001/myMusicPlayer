@@ -1,20 +1,20 @@
 <app-header [title]="language.title" settings=true></app-header>
 
 <ion-item id="shearchInput">
-  <ion-icon name="search-outline" slot="start" color="light"></ion-icon>
+  <ion-icon name="search-outline" slot="start"></ion-icon>
   <ion-input type="text" [(ngModel)]="songName" (ionChange)="findByName()" [placeholder]="language.search"></ion-input>
-  <ion-icon name="close-circle-outline" slot="end" color="light" (click)="removeFind()"></ion-icon>
+  <ion-icon name="close-circle-outline" slot="end" (click)="removeFind()"></ion-icon>
 </ion-item>
 
 <ion-content>
   <ion-list *ngIf="playList.length>0">
     <ion-item button *ngFor="let song of playList" (click)="start(song)">
-      <ion-label [color]="song==activeSong?'success':'light'">{{song.name}}</ion-label>
+      <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">{{song.name}}</ion-label>
     </ion-item>
   </ion-list>
 </ion-content>
 
-<ion-footer *ngIf="activeSong">
+<ion-footer *ngIf="activeSong" class="ion-no-border">
   <ion-toolbar>
     <ion-row>
       <ion-col size="4" class="modCol">
@@ -42,21 +42,21 @@
           <ion-icon slot="end" name="volume-high-outline"></ion-icon>
         </ion-range>
         <ion-range *ngIf="!toggleProgressVolume" #progressRange pin
-          min="0" max="100" [(ngModel)]="progress" color="success" (touchend)="seek()" (mouseup)="seek()">
+          min="0" max="100" [(ngModel)]="progress" [color]="this._theme.getColorStr()" (touchend)="seek()" (mouseup)="seek()">
           <ion-label slot="start">{{currentTime.minutes}}:{{currentTime.seconds}}</ion-label>
           <ion-label slot="end">{{totalTime.minutes}}:{{totalTime.seconds}}</ion-label>
 
         </ion-range>
       </ion-col>
       <ion-col size="12" class="ion-text-center">
-        <ion-button fill="clear" (click)="prev()" color="light">
+        <ion-button fill="clear" (click)="prev()">
           <ion-icon name="play-skip-back"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="togglePlayer()" color="light" >
+        <ion-button fill="clear" (click)="togglePlayer()">
           <ion-icon name="play" *ngIf="!isPlaying"></ion-icon>
           <ion-icon name="pause" *ngIf="isPlaying"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="next()" color="light">
+        <ion-button fill="clear" (click)="next()">
           <ion-icon name="play-skip-forward"></ion-icon>
         </ion-button>
       </ion-col>

@@ -20,5 +20,17 @@
       <ion-select-option value="en">{{language.english}}</ion-select-option>
     </ion-select>
   </ion-item>
+  <ion-item>
+    <ion-label>{{language.theme}}:</ion-label>
+    <ion-select [(ngModel)]="themeValue"
+                mode="ios"
+                (ionChange)="toggleTheme()"
+                interface="popover"
+                cancelText="Cancelar"
+                css-class>
+      <ion-select-option value="dark">{{language.themeDark}}</ion-select-option>
+      <ion-select-option value="light">{{language.themeLight}}</ion-select-option>
+    </ion-select>
+  </ion-item>
 </ion-list>
 </ion-content>

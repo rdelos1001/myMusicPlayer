@@ -1,12 +1,13 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { IonRange, Platform } from '@ionic/angular';
+import { IonLabel, IonRange, Platform } from '@ionic/angular';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { Plugins } from '@capacitor/core';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { Howl, Howler } from 'howler';
+import { ThemeService } from 'src/app/services/theme.service';
 
 const { Filesystem } = Plugins;
 @Component({
@@ -15,22 +16,35 @@ const { Filesystem } = Plugins;
   styleUrls: ['./songs.page.scss'],
 })
 export class SongsPage implements OnInit {
-  playList:Song[]=[ 
-/*     {
-      name:"Song 1",
+  playList:Song[]=[
+    {
+      name:"A day to remember - It's Complicated",
        path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
     {
-      name:"Song 2",
-       path:"assets/mp3/A day to remember - It's Complicated.mp3"
+      name:"ACDC - Highway to Hell",
+       path:"assets/mp3/ACDC - Highway to Hell.mp3"
     },
     {
-      name:"Song 3",
-       path:"assets/mp3/A day to remember - It's Complicated.mp3"
-    } */
+      name:"ACDC - Thunderstruck",
+       path:"assets/mp3/ACDC - Thunderstruck.mp3"
+    }
    ]
   toggleProgressVolume:boolean=false;
-  allSongs:Song[]=[  ]
+  allSongs:Song[]=[ 
+    {
+      name:"A day to remember - It's Complicated",
+       path:"assets/mp3/A day to remember - It's Complicated.mp3"
+    },
+    {
+      name:"ACDC - Highway to Hell",
+       path:"assets/mp3/ACDC - Highway to Hell.mp3"
+    },
+    {
+      name:"ACDC - Thunderstruck",
+       path:"assets/mp3/ACDC - Thunderstruck.mp3"
+    }
+   ]
   songName="";
   SDCARD_DIR=""
   FILESYSTEM_DIR="";
@@ -41,7 +55,7 @@ export class SongsPage implements OnInit {
   language;
   mod:number=1;
   volume=100;
-  currentTime={
+  currentTime={ 
     minutes:0,
     seconds:""
   };
@@ -55,10 +69,9 @@ export class SongsPage implements OnInit {
               public platform: Platform,
               public file: File,
               private _utils:UtilsService,
-              private _language:LanguageService ) { 
-               
-                
-               }
+              private _language:LanguageService,
+              private _theme:ThemeService ) { }
+
   ionViewWillEnter(){
     this.language=this._language.getActiveLanguage().songsPage;
   }
@@ -104,11 +117,11 @@ export class SongsPage implements OnInit {
   }
 
   findByName(){
-    var aux= this.songName;
+    this.songName;
     if(this.songName==""){
       this.playList=this.allSongs;
     }else{
-      var regex=new RegExp(aux,'i');
+      var regex=new RegExp(this.songName,'i');
       var aux2:Song[]=[];
       for (const song of this.allSongs) {
         if(regex.test(song.name)){

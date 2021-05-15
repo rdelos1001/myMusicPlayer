@@ -15,6 +15,9 @@
         "language":"Idioma",
         "spanish":"Español",
         "english":"Inglés",
-        "notAvailable":"No disponible"
+        "notAvailable":"No disponible",
+        "theme":"Tema",
+        "themeDark":"Oscuro",
+        "themeLight":"Claro"
     }
 }

@@ -9,7 +9,13 @@
   </ion-item>
   <ion-item>
     <ion-label>{{language.language}}:</ion-label>
-    <ion-select [(ngModel)]="languageValue" value="español" (ionChange)="setLanguage()" interface="popover" cancelText="Cancelar">
+    <ion-select [(ngModel)]="languageValue" 
+                value="español"
+                mode="ios"
+                (ionChange)="setLanguage()" 
+                interface="popover"
+                cancelText="Cancelar"
+                css-class>
       <ion-select-option value="sp">{{language.spanish}}</ion-select-option>
       <ion-select-option value="en">{{language.english}}</ion-select-option>
     </ion-select>

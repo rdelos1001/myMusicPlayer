@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { LanguageService } from './services/language.service';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,9 @@ import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private _language:LanguageService,private navBar:NavigationBar) {
+  constructor(private _language:LanguageService,
+              private navBar:NavigationBar,
+              private backGroundMode:BackgroundMode) {
     if(!this._language.getLanguage()){
       this._language.setLanguage('sp');
     }
@@ -17,6 +20,9 @@ export class AppComponent {
     }else if(this._language.getLanguage()=="en"){
       this._language.loadEnglishLanguage();
     }
-    this.navBar.setUp();
+    document.addEventListener('deviceready',()=>{
+      this.backGroundMode.enable();
+      this.navBar.hideNavigationBar();
+    })
   }
 }

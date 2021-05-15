@@ -4,6 +4,7 @@ import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FilePath } from '@ionic-native/file-path/ngx';
@@ -26,6 +27,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
   providers: [
     File,
     FilePath,
+    BackgroundMode,
     Diagnostic,
     NavigationBar,
     StatusBar,

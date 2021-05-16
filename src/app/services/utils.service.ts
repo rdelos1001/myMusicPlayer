@@ -29,4 +29,16 @@ export class UtilsService {
     });
     toast.present();
   }
+
+  isFirstUse():boolean{
+    var firstUse=localStorage.getItem('firstUse');
+    if(firstUse){
+      return false
+    }else{
+      return true;
+    }
+  }
+  setToNonFirtUse(){
+    localStorage.setItem('firstUse','false');
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { IonLabel, IonRange, Platform } from '@ionic/angular';
+import { IonRange, Platform } from '@ionic/angular';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { Plugins } from '@capacitor/core';
@@ -8,6 +8,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { Howl, Howler } from 'howler';
 import { ThemeService } from 'src/app/services/theme.service';
+import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 
 const { Filesystem } = Plugins;
 @Component({
@@ -70,25 +71,38 @@ export class SongsPage implements OnInit {
               public file: File,
               private _utils:UtilsService,
               private _language:LanguageService,
-              private _theme:ThemeService ) { }
+              private _theme:ThemeService,
+              private navBar:NavigationBar ) { }
 
   ionViewWillEnter(){
+    this.navBar.setUp()
+    this.navBar.hideNavigationBar();
     this.language=this._language.getActiveLanguage().songsPage;
   }
   async ngOnInit() {
     console.log("ngOnInit");
+    if(this._utils.isFirstUse()){
+      this._utils.setToNonFirtUse();
+    }
     this.language=this._language.getActiveLanguage().songsPage;
 
     this._utils.presentLoading(this.language.loadingSongs);
     Filesystem.requestPermissions().then(async()=>{
+      
       var path="/storage";
       this.FILESYSTEM_DIR=path+"/emulated/0";
-      var dir= await Filesystem.readdir({path});
-      dir.files.forEach((el)=>{
-        if(el!="self" && el!="emulated"){
-          this.SDCARD_DIR=path+"/"+el;
-        }
+      await Filesystem.readdir({path})
+      .then((dir)=>{
+        dir.files.forEach((el)=>{
+          if(el!="self" && el!="emulated"){
+            this.SDCARD_DIR=path+"/"+el;
+          }
+        })
       })
+      .catch((err)=>{
+        console.error("ERROR LEYENDO /storage");
+        console.error(err);
+      });
 
       this.findSongs(this.SDCARD_DIR+"/Music");
       this.findSongs(this.SDCARD_DIR+"/Download");
@@ -104,7 +118,6 @@ export class SongsPage implements OnInit {
     Filesystem.readdir({path}).then((dir)=>{
       dir.files.forEach(async(el)=>{
         if(el.endsWith('.mp3')){
-          console.log(el);
           var win:any=window;
           let songPath=win.Ionic.WebView.convertFileSrc(path+"/"+el.replace('%',escape("%")));
           this.allSongs.push({name:el.substring(0,el.lastIndexOf('.')),path:songPath})
@@ -126,18 +139,17 @@ export class SongsPage implements OnInit {
   }
 
   findByName(){
-    this.songName;
     if(this.songName==""){
       this.playList=this.allSongs;
     }else{
       var regex=new RegExp(this.songName,'i');
-      var aux2:Song[]=[];
+      var aux:Song[]=[];
       for (const song of this.allSongs) {
         if(regex.test(song.name)){
-          aux2.push(song);
+          aux.push(song);
         }
       }
-      this.playList=aux2;
+      this.playList=aux;
     }
   }
 

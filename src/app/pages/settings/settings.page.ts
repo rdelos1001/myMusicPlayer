@@ -35,11 +35,10 @@ export class SettingsPage implements OnInit {
     }
   }
   setLanguage(){
-    this._language.setLanguage(this.languageValue);
-    if(this.languageValue=="sp"){
-      this._language.loadSpanishLanguage();
-    }else if( this.languageValue=="en"){
-      this._language.loadEnglishLanguage();
+    if(this.languageValue===this._language.SPANISH){
+      this._language.setLanguage(this._language.SPANISH);
+    }else if( this.languageValue===this._language.ENGLISH){
+      this._language.setLanguage(this._language.ENGLISH);
     }
     //this.language=this._language.getActiveLanguage().settingsPage;
   }

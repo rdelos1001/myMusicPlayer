@@ -8,6 +8,7 @@ import { SongsPageRoutingModule } from './songs-routing.module';
 
 import { SongsPage } from './songs.page';
 import { ComponentsModule } from 'src/app/components/components.module';
+import { FilterPipe } from 'src/app/pipes/filter.pipe';
 
 @NgModule({
   imports: [
@@ -17,6 +18,6 @@ import { ComponentsModule } from 'src/app/components/components.module';
     SongsPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [SongsPage]
+  declarations: [SongsPage,FilterPipe]
 })
 export class SongsPageModule {}

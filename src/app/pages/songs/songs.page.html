@@ -2,13 +2,13 @@
 
 <ion-item id="shearchInput">
   <ion-icon name="search-outline" slot="start"></ion-icon>
-  <ion-input type="text" [(ngModel)]="songName" (ionChange)="findByName()" [placeholder]="language.search"></ion-input>
+  <ion-input type="text" [(ngModel)]="filterSong" name="filterSong" (ionChange)="findByName()" [placeholder]="language.search"></ion-input>
   <ion-icon name="close-circle-outline" slot="end" (click)="removeFind()"></ion-icon>
 </ion-item>
 
 <ion-content>
   <ion-list *ngIf="playList.length>0">
-    <ion-item button *ngFor="let song of playList" (click)="start(song)">
+    <ion-item button *ngFor="let song of allSongs | filter:filterSong" (click)="start(song)">
       <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">{{song.name}}</ion-label>
     </ion-item>
   </ion-list>

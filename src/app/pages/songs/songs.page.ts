@@ -10,6 +10,7 @@ import { Howl, Howler } from 'howler';
 import { ThemeService } from 'src/app/services/theme.service';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
+import { FilterPipe } from 'src/app/pipes/filter.pipe';
 
 const { Filesystem } = Plugins;
 @Component({
@@ -32,19 +33,20 @@ export class SongsPage implements OnInit {
        path:"assets/mp3/ACDC - Thunderstruck.mp3"
     }
    ]
+  filterSong='';
   toggleProgressVolume:boolean=false;
   allSongs:Song[]=[ 
     {
       name:"A day to remember - It's Complicated",
-       path:"assets/mp3/A day to remember - It's Complicated.mp3"
+      path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
     {
       name:"ACDC - Highway to Hell",
-       path:"assets/mp3/ACDC - Highway to Hell.mp3"
+      path:"assets/mp3/ACDC - Highway to Hell.mp3"
     },
     {
       name:"ACDC - Thunderstruck",
-       path:"assets/mp3/ACDC - Thunderstruck.mp3"
+      path:"assets/mp3/ACDC - Thunderstruck.mp3"
     }
    ]
   songName="";
@@ -108,7 +110,6 @@ export class SongsPage implements OnInit {
       this.findSongs(this.FILESYSTEM_DIR+"/Music");
       this.findSongs(this.FILESYSTEM_DIR+"/Download");
 
-      this.findByName();
       this._utils.hideLoading();
     })
   }
@@ -137,21 +138,6 @@ export class SongsPage implements OnInit {
     });
   }
 
-  findByName(){
-    if(this.songName==""){
-      this.playList=this.allSongs;
-    }else{
-      var regex=new RegExp(this.songName,'i');
-      var aux:Song[]=[];
-      for (const song of this.allSongs) {
-        if(regex.test(song.name)){
-          aux.push(song);
-        }
-      }
-      this.playList=aux;
-    }
-  }
-
   setMod(mod:number){
     this.mod=mod;
     switch(mod){
@@ -163,10 +149,7 @@ export class SongsPage implements OnInit {
         break
     }
   }
-  removeFind(){
-    this.songName="";
-    this.findByName();
-  }
+
   start(song:Song){
     this.toggleProgressVolume=false
     if(this.progressRange)

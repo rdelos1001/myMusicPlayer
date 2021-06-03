@@ -18,13 +18,15 @@ import { MusicControls } from '@ionic-native/music-controls/ngx';
 import { Toast } from '@ionic-native/toast/ngx';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent, 
+  ],
   entryComponents: [],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [
     File,

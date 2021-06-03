@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,9 @@ export class ThemeService {
   renderer:Renderer2
   LIGHT_THEME="light-theme";
   DARK_THEME="dark-theme";
-  constructor(private rendererFactory:RendererFactory2,@Inject(DOCUMENT) private document:Document) {
+  constructor(private rendererFactory:RendererFactory2,
+              private statusBar:StatusBar,
+              @Inject(DOCUMENT) private document:Document) {
     this.renderer=this.rendererFactory.createRenderer(null,null);
    }
 
@@ -39,8 +42,10 @@ export class ThemeService {
     localStorage.setItem("theme",theme);
     if(theme===this.DARK_THEME){
       this.enableDark();
+      this.statusBar.backgroundColorByHexString('#222428');
     }else{
       this.enableLight();
+      this.statusBar.backgroundColorByHexString('#ff6347');
     }
   }
 }

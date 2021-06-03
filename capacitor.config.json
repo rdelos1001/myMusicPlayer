@@ -9,5 +9,14 @@
       "launchShowDuration": 0
     }
   },
-  "cordova": {}
+  "cordova": {},
+  "server": {
+    "plugins": {
+      "LocalNotifications": {
+        "smallIcon": "ic_stat_audiotrack",
+        "iconColor": "#00FF00",
+        "sound": "smb_jump-super.wav"
+      }
+    }
+  }
 }

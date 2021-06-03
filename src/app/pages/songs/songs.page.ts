@@ -9,6 +9,7 @@ import { LanguageService } from 'src/app/services/language.service';
 import { Howl, Howler } from 'howler';
 import { ThemeService } from 'src/app/services/theme.service';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
+import { MusicControls } from '@ionic-native/music-controls/ngx';
 
 const { Filesystem } = Plugins;
 @Component({
@@ -18,7 +19,7 @@ const { Filesystem } = Plugins;
 })
 export class SongsPage implements OnInit {
   playList:Song[]=[
-/*     {
+    {
       name:"A day to remember - It's Complicated",
        path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
@@ -29,11 +30,11 @@ export class SongsPage implements OnInit {
     {
       name:"ACDC - Thunderstruck",
        path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    } */
+    }
    ]
   toggleProgressVolume:boolean=false;
   allSongs:Song[]=[ 
- /*    {
+    {
       name:"A day to remember - It's Complicated",
        path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
@@ -44,7 +45,7 @@ export class SongsPage implements OnInit {
     {
       name:"ACDC - Thunderstruck",
        path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    } */
+    }
    ]
   songName="";
   SDCARD_DIR=""
@@ -72,7 +73,8 @@ export class SongsPage implements OnInit {
               private _utils:UtilsService,
               private _language:LanguageService,
               private _theme:ThemeService,
-              private navBar:NavigationBar ) { }
+              private navBar:NavigationBar,
+              private musicControls:MusicControls ) { }
 
   ionViewWillEnter(){
     this.navBar.setUp()
@@ -81,9 +83,6 @@ export class SongsPage implements OnInit {
   }
   async ngOnInit() {
     console.log("ngOnInit");
-    if(this._utils.isFirstUse()){
-      this._utils.setToNonFirtUse();
-    }
     this.language=this._language.getActiveLanguage().songsPage;
 
     this._utils.presentLoading(this.language.loadingSongs);
@@ -189,6 +188,7 @@ export class SongsPage implements OnInit {
       }
     })
     this.player.play();
+    this.createMusicControls(song);
   }
   togglePlayer(){
     if(this.isPlaying){
@@ -265,5 +265,76 @@ export class SongsPage implements OnInit {
       minutes,
       seconds:secondsStr
     }
+  }
+  createMusicControls(song:Song){
+    this.musicControls.destroy();
+    this.musicControls.create({
+      track       : song.name,		// optional, default : ''
+      artist      : '',						// optional, default : ''
+      album       : '',     // optional, default: ''
+      cover       : '/assets/icon/icon.png',		// optional, default : nothing
+      // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
+      //			 or a remote url ('http://...', 'https://...', 'ftp://...')
+      isPlaying   : true,							// optional, default : true
+      dismissable : false,							// optional, default : false
+    
+      // hide previous/next/close buttons:
+      hasPrev   : true,		// show previous button, optional, default: true
+      hasNext   : true,		// show next button, optional, default: true
+      hasClose  : false,		// show close button, optional, default: false
+    
+      // Android only, optional
+      // text displayed in the status bar when the notification (and the ticker) are updated
+      ticker	  : '',
+      //All icons default to their built-in android equivalents
+      //The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
+    	
+      //Flaticon author Freepik
+      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
+      playIcon: 'play.png',
+
+      //Flaticon author Freepik
+      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
+      pauseIcon: 'pause.png',
+      prevIcon: 'media_prev',
+      nextIcon: 'media_next',
+      closeIcon: 'media_close',
+      notificationIcon: 'notification'
+    });
+    this.musicControls.listen();
+    this.musicControls.subscribe().subscribe((action)=>{
+        const message = JSON.parse(action).message;
+        switch(message) {
+          case 'music-controls-next':
+            this.next();
+            // Do something
+            break;
+          case 'music-controls-previous':
+            // Do something
+            this.prev();
+            break;
+          case 'music-controls-pause' || 'music-controls-play':
+            // Do something
+            this.togglePlayer();
+            this.musicControls.updateIsPlaying(false)
+            break;
+          case 'music-controls-destroy':
+            // Do something
+            this.player.stop();
+            break;
+          case 'music-controls-toggle-play-pause' :
+            // Do something
+            
+            break;
+
+          default:
+            break;
+        }
+      
+      // Start listening for events
+      // The plugin will run the events function each time an event is fired
+      this.musicControls.listen();
+      this.musicControls.updateIsPlaying(true)
+    })
   }
 }

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LoadingController, ToastController } from '@ionic/angular';
+import { Toast } from '@ionic-native/toast/ngx';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root'

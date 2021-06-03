@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package in.raul.RPlayer;
 
 import android.os.Bundle;
 

@@ -3,7 +3,13 @@ ion-content, ion-list, ion-item,ion-toolbar{
     --ion-background-color:var(--background-color);
     color:var(--text-color);
 }
-
+.songItem{
+    display: flex;
+    justify-content: space-between;
+    ion-item{
+        width: 100%;
+    }
+}
 .activeSong{
     color: var(--text-color-selected);
 }
@@ -42,4 +48,14 @@ ion-footer{
     ion-icon{
         font-size: 35px;
     }
+}
+ion-range{
+    padding: 0;
+}
+#musicControls{
+    position: relative;
+}
+#viewPlayListBtn{
+    position: absolute;
+    right: 0;
 }

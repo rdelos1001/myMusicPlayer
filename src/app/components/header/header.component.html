@@ -2,7 +2,7 @@
   <ion-toolbar>
     <div>
       <ion-buttons *ngIf="back" slot="start">
-        <ion-back-button defaultHref="songs" mode="md"></ion-back-button>
+        <ion-back-button defaultHref="/songs" mode="md"></ion-back-button>
       </ion-buttons>
       <ion-title>{{title}}</ion-title>
       <ion-button *ngIf="settings" (click)="navigate('settings')">

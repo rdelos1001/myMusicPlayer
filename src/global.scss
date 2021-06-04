@@ -24,12 +24,19 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
-@import "/src/app/app.component.scss";
 
 .toast{
-    --background: var(--ion-color-light-tint);
-    --color: #000;
+    --background: var(--background-color-contrast);
+    --color: var(--text-color-contrast);
 }
 ion-button,ion-icon{
     --background: transparent;
+}
+
+body{
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+.modal .modal-wrapper{
+    --background: var(--background-color);
 }

@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { IonRange, Platform } from '@ionic/angular';
+import { IonRange, ModalController, Platform } from '@ionic/angular';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { Plugins } from '@capacitor/core';
@@ -10,7 +10,7 @@ import { Howl, Howler } from 'howler';
 import { ThemeService } from 'src/app/services/theme.service';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
-import { FilterPipe } from 'src/app/pipes/filter.pipe';
+import { ViewPlayListComponent } from 'src/app/components/view-play-list/view-play-list.component';
 
 const { Filesystem } = Plugins;
 @Component({
@@ -36,7 +36,7 @@ export class SongsPage implements OnInit {
   filterSong='';
   toggleProgressVolume:boolean=false;
   allSongs:Song[]=[ 
-    {
+/*     {
       name:"A day to remember - It's Complicated",
       path:"assets/mp3/A day to remember - It's Complicated.mp3"
     },
@@ -47,7 +47,7 @@ export class SongsPage implements OnInit {
     {
       name:"ACDC - Thunderstruck",
       path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    }
+    } */
    ]
   songName="";
   SDCARD_DIR=""
@@ -76,7 +76,8 @@ export class SongsPage implements OnInit {
               private _language:LanguageService,
               private _theme:ThemeService,
               private navBar:NavigationBar,
-              private musicControls:MusicControls ) { }
+              private musicControls:MusicControls,
+              private modalController: ModalController) { }
 
   ionViewWillEnter(){
     this.navBar.setUp()
@@ -109,7 +110,8 @@ export class SongsPage implements OnInit {
       this.findSongs(this.SDCARD_DIR+"/Download");
       this.findSongs(this.FILESYSTEM_DIR+"/Music");
       this.findSongs(this.FILESYSTEM_DIR+"/Download");
-
+      
+      this.playList=this.allSongs;
       this._utils.hideLoading();
     })
   }
@@ -146,7 +148,10 @@ export class SongsPage implements OnInit {
         break;
       case 2:
         this._utils.presentToast(this.language.changeToSufflePlay);
-        break
+        break;
+      case 3:
+        this._utils.presentToast(this.language.changeToRepeatOne);
+        break;
     }
   }
 
@@ -181,7 +186,10 @@ export class SongsPage implements OnInit {
     }
     this.isPlaying=!this.isPlaying;
   }
-
+  clickSong(song:Song){
+    this.playList=this.allSongs;
+    this.start(song);
+  }
   next(){
     let index;
     switch(this.mod){
@@ -189,10 +197,16 @@ export class SongsPage implements OnInit {
         index=this.playList.indexOf(this.activeSong)+1;
         break;
       case 2:
-        index= Math.round( Math.random()*(this.playList.length-1) );
+        do{
+          index= Math.round( Math.random()*(this.playList.length-1) );
+        }while(index==this.playList.indexOf(this.activeSong));
+        break;
+      case 3:
+        index=this.playList.indexOf(this.activeSong);
         break;
     }
-
+    console.log("index anterior canción-> "+this.playList.indexOf(this.activeSong));
+    console.log("index proxima canción -> "+index);
     if(index==this.playList.length){
       this.start(this.playList[0]);
     }else{
@@ -220,7 +234,7 @@ export class SongsPage implements OnInit {
     this.progress=(seek/this.player.duration())*100||0;
     setTimeout(()=>{
       this.updateProgress()
-    },500);
+    },1000);
   }
   changeVolume(volume?:number){
     let newVolume=volume==undefined?this.volume:volume;
@@ -258,7 +272,7 @@ export class SongsPage implements OnInit {
       cover       : '/assets/icon/icon.png',		// optional, default : nothing
       // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
       //			 or a remote url ('http://...', 'https://...', 'ftp://...')
-      isPlaying   : true,							// optional, default : true
+      isPlaying   : true,			// optional, default : true
       dismissable : false,							// optional, default : false
     
       // hide previous/next/close buttons:
@@ -296,10 +310,14 @@ export class SongsPage implements OnInit {
             // Do something
             this.prev();
             break;
-          case 'music-controls-pause' || 'music-controls-play':
+          case 'music-controls-pause':
             // Do something
             this.togglePlayer();
-            this.musicControls.updateIsPlaying(false)
+            this.musicControls.updateIsPlaying(false);
+            break;
+          case 'music-controls-play':
+              this.togglePlayer();
+              this.musicControls.updateIsPlaying(false);
             break;
           case 'music-controls-destroy':
             // Do something
@@ -319,5 +337,39 @@ export class SongsPage implements OnInit {
       this.musicControls.listen();
       this.musicControls.updateIsPlaying(true)
     })
+  }
+  songSettings(song:Song){
+    this._utils.songSettingMenu(song).then((role)=>{
+      if(role==="playLater"){
+        var currentSongIndex=this.playList.indexOf(this.activeSong);
+        if(currentSongIndex!=-1){
+          var moveSong=this.playList.splice(this.playList.indexOf(song),1)[0];
+          this.playList.splice(this.playList.indexOf(this.activeSong)+1,0,moveSong);
+          console.log(this.playList)
+        }else{
+          this._utils.presentToast(this.language.aSongMustBePlaying);
+        }
+      }
+    });
+  }
+  async viewPlayList(){
+      const modal = await this.modalController.create({
+        component:ViewPlayListComponent,
+        componentProps:{
+          playList:this.playList
+        },
+        cssClass:"modal",
+        mode:"ios",
+        swipeToClose:true,
+        showBackdrop:true
+      });
+    
+      await modal.present();
+
+      const {data} = await modal.onDidDismiss();
+      if(data){
+        this.playList=data
+      }
+      console.log(data)
   }
 }

@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { LoadingController, ToastController } from '@ionic/angular';
-import { Toast } from '@ionic-native/toast/ngx';
-import { ThemeService } from './theme.service';
+import { ActionSheetController, LoadingController, ToastController } from '@ionic/angular';
+import { Song } from '../interfaces/song';
+import { LanguageService } from './language.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilsService {
-
   constructor(private loadingController: LoadingController,
-              private toastController: ToastController) { }
-
+              private toastController: ToastController,
+              private actionSheetController: ActionSheetController,
+              private _language:LanguageService) { }
   async presentLoading(message:string,t?:number) {
     const loading = await this.loadingController.create({
       message,
@@ -42,5 +42,30 @@ export class UtilsService {
   }
   setToNonFirtUse(){
     localStorage.setItem('firstUse','false');
+  }
+  async songSettingMenu(song:Song) {
+    var addLabel=this._language.getActiveLanguage().songsPage.addToPlayList;
+    var cancelLabel=this._language.getActiveLanguage().songsPage.cancel;
+    var playLaterLabel=this._language.getActiveLanguage().songsPage.playLater;
+
+    const actionSheet = await this.actionSheetController.create({
+      header: song.name,
+      buttons: [/* {
+        text: addLabel,
+        icon: 'share',
+        role: 'addToPlayList'
+      }, */{
+        text: playLaterLabel,
+        icon: 'share',
+        role: 'playLater'
+      }, {
+        text: cancelLabel,
+        icon: 'close',
+        role: 'cancel'
+      }]
+    });
+    await actionSheet.present();
+    const { role } = await actionSheet.onDidDismiss();
+    return role;
   }
 }

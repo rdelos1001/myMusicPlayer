@@ -5,8 +5,12 @@
         "search":"Buscar",
         "loadingSongs":"Importando canciones ...",
         "changeToSufflePlay":"Modo aleatorio activado",
-        "changeToNormalPlay":"Modo normal activado"
-
+        "changeToNormalPlay":"Modo normal activado",
+        "changeToRepeatOne":"Repitiendo la canción actual",
+        "addToPlayList":"Añadir a la lista de reproducción",
+        "cancel":"Cancelar",
+        "playLater":"Reproducir después",
+        "aSongMustBePlaying":"Para usar esta función se debe estar reproduciendo una canción"
     },
     "settingsPage":{
         "title":"Ajustes",

@@ -23,7 +23,7 @@ export class SettingsPage implements OnInit {
   async ngOnInit() {
     this.themeValue=this._theme.isDarkModeEnable()?'dark':'light';
     this.languageValue=this._language.getLanguage();
-    this.language=this._language.getActiveLanguage().settingsPage;
+    this.language=this._language.getActiveLanguage();
     this.version=await this.appVersion.getVersionNumber();
   }
 

@@ -12,7 +12,6 @@ import { File } from '@ionic-native/file/ngx';
 import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { HttpClientModule } from '@angular/common/http';
-import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
 import { Toast } from '@ionic-native/toast/ngx';
@@ -33,7 +32,6 @@ import { Toast } from '@ionic-native/toast/ngx';
     FilePath,
     BackgroundMode,
     Diagnostic,
-    NavigationBar,
     StatusBar,
     Toast,
     MusicControls,

@@ -1,4 +1,4 @@
-<app-header [title]="language.title" settings=true></app-header>
+<app-header [title]="language.songs" settings=true></app-header>
 
 <ion-item id="shearchInput">
   <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -18,65 +18,20 @@
     </div>
   </ion-list>
 </ion-content>
-
-<ion-footer *ngIf="activeSong" class="ion-no-border">
+<ion-footer *ngIf="activeSong">
   <ion-toolbar>
-    <ion-row>
-      <ion-col size="4" class="modCol">
-        <ion-button (click)="setMod(2)" *ngIf="mod==1">
-          <ion-icon slot="icon-only" name="repeat-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="setMod(3)" *ngIf="mod==2">
-          <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="setMod(1)" *ngIf="mod==3">
-          <ion-icon slot="icon-only" src="assets/icon/repeat-one.svg" alt=""></ion-icon>
-        </ion-button>
-      </ion-col>
-      <ion-col size="4" class="ion-text-center">{{activeSong.name}}</ion-col>
-      <ion-col size="4" class="ion-text-right" id="volumeCol">
-        <ion-button (click)="toggleVolumeBar()">
-          <ion-icon *ngIf="volume>=66" name="volume-high-outline"></ion-icon>
-          <ion-icon *ngIf="volume>=33 && volume<66" name="volume-medium-outline"></ion-icon>
-          <ion-icon *ngIf="volume>0  && volume<33" name="volume-low-outline"></ion-icon>
-          <ion-icon *ngIf="volume==0" name="volume-mute-outline"></ion-icon>
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col size="12">
-        <ion-range *ngIf="toggleProgressVolume" id="volumeRange" min="0" max="100" pin color="primary" [(ngModel)]="volume"
-          (touchend)="changeVolume()"
-          (mouseup)="changeVolume()">
-          <ion-icon (click)="changeVolume(0)" slot="start" name="volume-mute-outline"></ion-icon>
-          <ion-icon (click)="changeVolume(100)" slot="end" name="volume-high-outline"></ion-icon>
-        </ion-range>
-        <ion-range *ngIf="!toggleProgressVolume" #progressRange pin
-          min="0" max="100" [(ngModel)]="progress" [color]="this._theme.getColorStr()" (touchend)="seek()" (mouseup)="seek()">
-          <ion-label slot="start">{{currentTime.minutes}}:{{currentTime.seconds}}</ion-label>
-          <ion-label slot="end">{{totalTime.minutes}}:{{totalTime.seconds}}</ion-label>
+    <div class="songItem">
+      <ion-item button (click)="clickFooter()">
+        <ion-label>{{activeSong.name}}</ion-label>
+      </ion-item>
+      <ion-button (click)="togglePlayer(song)">
+        <ion-icon name="play"  *ngIf="!isPlaying"></ion-icon>
+        <ion-icon name="pause" *ngIf="isPlaying" ></ion-icon>
+      </ion-button>
+      <ion-button (click)="next()">
+        <ion-icon name="play-skip-forward"></ion-icon>
+      </ion-button>
+    </div>
 
-        </ion-range>
-      </ion-col>
-    </ion-row>
-    <ion-row id="musicControls">
-      <ion-col size="12" class="ion-text-center">
-        <ion-button fill="clear" (click)="prev()">
-          <ion-icon name="play-skip-back"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" (click)="togglePlayer()">
-          <ion-icon name="play" *ngIf="!isPlaying"></ion-icon>
-          <ion-icon name="pause" *ngIf="isPlaying"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" (click)="next()">
-          <ion-icon name="play-skip-forward"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" id="viewPlayListBtn" (click)="viewPlayList()">
-          <ion-icon slot="icon-only" name="list-outline"></ion-icon>
-        </ion-button>
-      </ion-col>
-      
-    </ion-row>
-    
   </ion-toolbar>
 </ion-footer>

@@ -1,27 +1,25 @@
 {
     "id":"sp",
-    "songsPage":{
-        "title":"Canciones",
-        "search":"Buscar",
-        "loadingSongs":"Importando canciones ...",
-        "changeToSufflePlay":"Modo aleatorio activado",
-        "changeToNormalPlay":"Modo normal activado",
-        "changeToRepeatOne":"Repitiendo la canción actual",
-        "addToPlayList":"Añadir a la lista de reproducción",
-        "cancel":"Cancelar",
-        "playLater":"Reproducir después",
-        "aSongMustBePlaying":"Para usar esta función se debe estar reproduciendo una canción"
-    },
-    "settingsPage":{
-        "title":"Ajustes",
-        "version":"Versión",
-        "author":"Autor",
-        "language":"Idioma",
-        "spanish":"Español",
-        "english":"Inglés",
-        "notAvailable":"No disponible",
-        "theme":"Tema",
-        "themeDark":"Oscuro",
-        "themeLight":"Claro"
-    }
+    "songs":"Canciones",
+    "search":"Buscar",
+    "loadingSongs":"Importando canciones ...",
+    "changeToSufflePlay":"Modo aleatorio activado",
+    "changeToNormalPlay":"Modo normal activado",
+    "changeToRepeatOne":"Repitiendo la canción actual",
+    "addToPlayList":"Añadir a la lista de reproducción",
+    "cancel":"Cancelar",
+    "playLater":"Reproducir después",
+    "aSongMustBePlaying":"Para usar esta función se debe estar reproduciendo una canción",
+    "playList":"Lista de reproducción",
+    "settings":"Ajustes",
+    "version":"Versión",
+    "author":"Autor",
+    "language":"Idioma",
+    "spanish":"Español",
+    "english":"Inglés",
+    "notAvailable":"No disponible",
+    "theme":"Tema",
+    "themeDark":"Oscuro",
+    "themeLight":"Claro"
+    
 }

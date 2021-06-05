@@ -4,11 +4,13 @@ import { HeaderComponent } from './header/header.component';
 import { FormsModule } from '@angular/forms';
 import { ViewPlayListComponent } from './view-play-list/view-play-list.component';
 import { IonicModule } from '@ionic/angular';
+import { SongPlayerComponent } from './song-player/song-player.component';
 
 @NgModule({
   declarations: [
     HeaderComponent,
-    ViewPlayListComponent
+    ViewPlayListComponent,
+    SongPlayerComponent
   ],
   imports: [
     CommonModule,
@@ -17,7 +19,8 @@ import { IonicModule } from '@ionic/angular';
   ],
   exports:[
     HeaderComponent,
-    ViewPlayListComponent
+    ViewPlayListComponent,
+    SongPlayerComponent
   ]
 })
 export class ComponentsModule { }

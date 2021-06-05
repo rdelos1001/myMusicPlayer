@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Song } from 'src/app/interfaces/song';
+import { LanguageService } from 'src/app/services/language.service';
 
 @Component({
   selector: 'app-view-play-list',
@@ -10,7 +11,11 @@ import { Song } from 'src/app/interfaces/song';
 export class ViewPlayListComponent implements OnInit {
 
   @Input() playList:Song[]
-  constructor(private modalController: ModalController) { }
+  language:any;
+  constructor(private modalController: ModalController,
+              private _language:LanguageService) {
+                this.language=this._language.getActiveLanguage();
+               }
 
   
   ngOnInit() {

@@ -1,10 +1,219 @@
 import { Injectable } from '@angular/core';
+import { MusicControls } from '@ionic-native/music-controls/ngx';
+import { Howl, Howler } from 'howler';
+import { Song } from '../interfaces/song';
+import { LanguageService } from './language.service';
+import { UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MusicControllerService {
+  player:Howl= null;
+  isPlaying:boolean=false;
+  progress=0;
+  mod:number=1;
+  currentTime={ 
+    minutes:0,
+    seconds:""
+  };
+  totalTime={
+    minutes:0,
+    seconds:""
+  };
+  toggleProgressVolume: boolean;
+  song: Song;
+  playList: Song[];
+  language:any;
+  constructor(private musicControls:MusicControls,
+              private _utils:UtilsService,
+              private _language:LanguageService) {
+                this.language=this._language.getActiveLanguage()
+  }
+  start(song:Song):Promise<Song>{
+    return new Promise<Song>((resolve)=>{
+      if (this.player){
+        this.player.stop();
+      }
+      this.player= new Howl({
+        src:[song.path],
+        html5:true,
+        onplay:()=>{
+          this.song=song;
+          this.isPlaying=true;
+          this.totalTime= this.getTime(this.player.duration());
+          resolve(song);
+        },
+        onend:()=>{
+          this.next();
+        }
+      })
+      this.player.play();
+      this.totalTime= this.getTime(this.player.duration());
+      this.createMusicControls(song);
+    })
+  }
+  async next():Promise<Song>{
+    let index;
+    var currentSong:Song;
+    switch(this.mod){
+      case 1:
+        index=this.playList.indexOf(this.song)+1;
+        break;
+      case 2:
+        do{
+          index= Math.round( Math.random()*(this.playList.length-1) );
+        }while(index==this.playList.indexOf(this.song));
+        break;
+      case 3:
+        index=this.playList.indexOf(this.song);
+        break;
+    }
+    console.log("index anterior canción-> "+this.playList.indexOf(this.song));
+    console.log("index proxima canción -> "+index);
+    if(index==this.playList.length){
+     currentSong= await this.start(this.playList[0]);
+    }else{
+      currentSong= await this.start(this.playList[index]);
+    }
+    return currentSong;
+  }
+  async prev():Promise<Song>{
+    let index=this.playList.indexOf(this.song);
+    var currentSong:Song;
+    if(index>0){
+      currentSong=await this.start(this.playList[index-1]);
+    }else{
+      currentSong=await this.start(this.playList[this.playList.length-1]);
+    }
+    return currentSong;
+  }
+  seek(seek:number){
+    let duration = this.player.duration();
+    this.player.seek(duration * ( seek / 100));
+  }
+  changeVolume(volume:number){
+    Howler.volume(volume/100);
+  }
 
-  constructor() {
+  public getTime(secondsNum:number){
+    let minutes=0;
+    let secondsStr="";
+    while(secondsNum>=60){
+      minutes++;
+      secondsNum-=60;
+    }
+    secondsNum=Math.round(secondsNum);
+    if(secondsNum<10){
+      secondsStr="0"+secondsNum;
+    }else{
+      secondsStr=secondsNum+"";
+    }
+
+    return {
+      minutes,
+      seconds:secondsStr
+    }
+  }
+  createMusicControls(song:Song){
+    this.musicControls.destroy();
+    this.musicControls.create({
+      track       : song.name,		// optional, default : ''
+      artist      : '',						// optional, default : ''
+      album       : '',     // optional, default: ''
+      cover       : '../../assets/icon/icon.png',		// optional, default : nothing
+      // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
+      //			 or a remote url ('http://...', 'https://...', 'ftp://...')
+      isPlaying   : true,			// optional, default : true
+      dismissable : false,							// optional, default : false
+    
+      // hide previous/next/close buttons:
+      hasPrev   : true,		// show previous button, optional, default: true
+      hasNext   : true,		// show next button, optional, default: true
+      hasClose  : false,		// show close button, optional, default: false
+    
+      // Android only, optional
+      // text displayed in the status bar when the notification (and the ticker) are updated
+      ticker	  : '',
+      //All icons default to their built-in android equivalents
+      //The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
+    	
+      //Flaticon author Freepik
+      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
+      playIcon: 'media_play',
+
+      //Flaticon author Freepik
+      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
+      pauseIcon: 'media_pause',
+      prevIcon: 'media_prev',
+      nextIcon: 'media_next',
+      closeIcon: 'media_close',
+      notificationIcon: 'notification'
+    });
+    this.musicControls.subscribe().subscribe((action)=>{
+        const message = JSON.parse(action).message;
+        switch(message) {
+          case 'music-controls-next':
+            this.next();
+            // Do something
+            break;
+          case 'music-controls-previous':
+            // Do something
+            this.prev();
+            break;
+          case 'music-controls-pause':
+            // Do something
+            this.player.pause();
+            this.isPlaying=false;
+            this.musicControls.updateIsPlaying(false);
+            break;
+          case 'music-controls-play':
+              this.player.play();
+              this.isPlaying=true;
+              this.musicControls.updateIsPlaying(true);
+            break;
+          case 'music-controls-destroy':
+            // Do something
+            this.player.stop();
+            break;
+          case 'music-controls-toggle-play-pause' :
+            // Do something
+            
+            break;
+
+          default:
+            break;
+        }      
+      })
+      // Start listening for events
+      // The plugin will run the events function each time an event is fired
+      this.musicControls.listen();
+      this.musicControls.updateIsPlaying(true)
+  }
+  togglePlayer(){
+    if(this.isPlaying){
+      this.player.pause();
+    }else{
+      this.player.play();
+    }
+    this.isPlaying=!this.isPlaying;
+  }
+  setPlayList(playList:Song[]){
+    this.playList=playList;
+  }
+  setMod(mod:number):number{
+    this.mod=mod;
+    switch(mod){
+      case 1:
+        this._utils.presentToast(this.language.changeToNormalPlay);
+        break;
+      case 2:
+        this._utils.presentToast(this.language.changeToSufflePlay);
+        break;
+      case 3:
+        this._utils.presentToast(this.language.changeToRepeatOne);
+        break;
+    }
+    return mod;
   }
 }

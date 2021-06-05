@@ -40,3 +40,16 @@ body{
 .modal .modal-wrapper{
     --background: var(--background-color);
 }
+ion-header{
+    background:var(--header-backgroundcolor) ;
+    ion-toolbar{
+        --background: var(--header-backgroundcolor);
+    }
+}
+ion-footer{
+    background: var(--background-color);
+    ion-toolbar{
+        --background:var(--background-color)
+        
+    } 
+}

@@ -8,6 +8,7 @@ ion-content, ion-list, ion-item,ion-toolbar{
     justify-content: space-between;
     ion-item{
         width: 100%;
+        --border-style:0;
     }
 }
 .activeSong{
@@ -35,27 +36,13 @@ ion-button{
     --background:var(--searchInput-background);
     width: 100%;
 }
-
-ion-footer{
-    --background:var(--background-color);
-    ion-toolbar{
-        ion-row{
-            margin-top: 1pc;
-        }
-        border-top: 2px solid var(--decorative-color);
-        border-radius: 10% 10% 0 0;
-    }
-    ion-icon{
-        font-size: 35px;
-    }
-}
-ion-range{
-    padding: 0;
-}
 #musicControls{
     position: relative;
 }
 #viewPlayListBtn{
     position: absolute;
     right: 0;
+}
+ion-footer{
+    border-top: 1px solid var(--decorative-color);
 }

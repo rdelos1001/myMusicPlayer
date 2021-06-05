@@ -1,6 +1,5 @@
-ion-icon,ion-title{
-    color: black;
-}
-ion-header{
-    padding-top: 2pc;
+ion-header > ion-toolbar {
+    ion-title, ion-button{
+        --color: white;
+    }
 }

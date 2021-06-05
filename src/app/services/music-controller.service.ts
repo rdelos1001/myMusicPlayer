@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
 import { Howl, Howler } from 'howler';
 import { Song } from '../interfaces/song';
@@ -22,7 +22,8 @@ export class MusicControllerService {
     seconds:""
   };
   toggleProgressVolume: boolean;
-  song: Song;
+  activeSong: Song;
+  changeSong:EventEmitter<Song>= new EventEmitter<Song>()
   playList: Song[];
   language:any;
   constructor(private musicControls:MusicControls,
@@ -39,7 +40,7 @@ export class MusicControllerService {
         src:[song.path],
         html5:true,
         onplay:()=>{
-          this.song=song;
+          this.setActiveSong(song);
           this.isPlaying=true;
           this.totalTime= this.getTime(this.player.duration());
           resolve(song);
@@ -58,34 +59,36 @@ export class MusicControllerService {
     var currentSong:Song;
     switch(this.mod){
       case 1:
-        index=this.playList.indexOf(this.song)+1;
+        index=this.playList.indexOf(this.activeSong)+1;
         break;
       case 2:
         do{
           index= Math.round( Math.random()*(this.playList.length-1) );
-        }while(index==this.playList.indexOf(this.song));
+        }while(index==this.playList.indexOf(this.activeSong));
         break;
       case 3:
-        index=this.playList.indexOf(this.song);
+        index=this.playList.indexOf(this.activeSong);
         break;
     }
-    console.log("index anterior canción-> "+this.playList.indexOf(this.song));
+    console.log("index anterior canción-> "+this.playList.indexOf(this.activeSong));
     console.log("index proxima canción -> "+index);
     if(index==this.playList.length){
      currentSong= await this.start(this.playList[0]);
     }else{
       currentSong= await this.start(this.playList[index]);
     }
+    this.setActiveSong(currentSong);
     return currentSong;
   }
   async prev():Promise<Song>{
-    let index=this.playList.indexOf(this.song);
+    let index=this.playList.indexOf(this.activeSong);
     var currentSong:Song;
     if(index>0){
       currentSong=await this.start(this.playList[index-1]);
     }else{
       currentSong=await this.start(this.playList[this.playList.length-1]);
     }
+    this.setActiveSong(currentSong);
     return currentSong;
   }
   seek(seek:number){
@@ -95,7 +98,6 @@ export class MusicControllerService {
   changeVolume(volume:number){
     Howler.volume(volume/100);
   }
-
   public getTime(secondsNum:number){
     let minutes=0;
     let secondsStr="";
@@ -215,5 +217,9 @@ export class MusicControllerService {
         break;
     }
     return mod;
+  }
+  setActiveSong(song:Song){
+    this.activeSong=song;
+    this.changeSong.emit(song);
   }
 }

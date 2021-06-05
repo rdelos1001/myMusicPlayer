@@ -66,6 +66,9 @@ export class SongsPage implements OnInit {
               }
               
   ngOnInit() {
+    this._musicController.changeSong.subscribe(song=>{
+      this.activeSong=song;
+    })
     this._utils.presentLoading(this.language.loadingSongs);
     Filesystem.requestPermissions().then(async (resp)=>{
       var path="/storage";
@@ -130,7 +133,7 @@ export class SongsPage implements OnInit {
     });
     await modal.present();
     await modal.onDidDismiss();
-    this.activeSong=this._musicController.song;
+    this.activeSong=this._musicController.activeSong;
     this.isPlaying=this._musicController.isPlaying;
   }
 
@@ -163,12 +166,10 @@ export class SongsPage implements OnInit {
     });
     await modal.present();
     await modal.onDidDismiss();
-    this.activeSong=this._musicController.song;
+    this.activeSong=this._musicController.activeSong;
     this.isPlaying=this._musicController.isPlaying;
   }
   next(){
-    this._musicController.next().then(song=>{
-      this.activeSong=song
-    })
+    this._musicController.next();
   }
 }

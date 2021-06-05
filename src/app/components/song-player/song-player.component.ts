@@ -35,11 +35,11 @@ export class SongPlayerComponent implements OnInit {
     seconds:""
   };
   constructor(private modalController: ModalController,
-    private _musicController:MusicControllerService,
-    private _language:LanguageService,
-    private _theme:ThemeService
+              private _musicController:MusicControllerService,
+              private _language:LanguageService,
+              private _theme:ThemeService
     ) { 
-      this.language=_language.getActiveLanguage()
+      this.language=_language.getActiveLanguage();
     }
   async ngOnInit() {
     if(!this.viewSongOrPlaySong){
@@ -48,7 +48,9 @@ export class SongPlayerComponent implements OnInit {
     this.totalTime=this._musicController.totalTime;
     this.isPlaying=this._musicController.isPlaying;
     this.updateProgress();
-
+    this._musicController.changeSong.subscribe((song)=>{
+      this.song=song
+    });
   }
   async start(song:Song){
     await this._musicController.start(song);
@@ -110,13 +112,9 @@ export class SongPlayerComponent implements OnInit {
       console.log(data)
   }
   prev(){
-    this._musicController.prev().then(song=>{
-      this.song=song;
-    })
+    this._musicController.prev();
   }
   next(){
-    this._musicController.next().then(song=>{
-      this.song=song;
-    });
+    this._musicController.next();
   }
 }

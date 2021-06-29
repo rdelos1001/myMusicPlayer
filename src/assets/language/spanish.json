@@ -20,6 +20,7 @@
     "notAvailable":"No disponible",
     "theme":"Tema",
     "themeDark":"Oscuro",
-    "themeLight":"Claro"
-    
+    "themeLight":"Claro",
+    "filter":"Filtrar",
+    "thisSongWillBePlayedNext":"Esta canción se reproducirá después"
 }

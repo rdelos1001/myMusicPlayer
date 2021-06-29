@@ -7,10 +7,18 @@
 </ion-item>
 
 <ion-content>
+  <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
+    <ion-icon slot="start" name="filter"></ion-icon>
+    {{language.filter}}
+  </ion-button>
   <ion-list *ngIf="allSongs.length>0">
     <div class="songItem" *ngFor="let song of allSongs | filter:filterSong">
       <ion-item button (click)="clickSong(song)">
-        <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">{{song.artist}} - {{song.title}}</ion-label>
+        <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">
+          <h2>{{song.title}}</h2>
+          <p>{{song.artist}}</p>
+        </ion-label>
+        <img *ngIf="song==activeSong && isPlaying" src="/assets/icon/music.gif" width="20px" alt="">
       </ion-item>
       <ion-button (click)="songSettings(song)">
         <ion-icon name="ellipsis-vertical-outline"></ion-icon>

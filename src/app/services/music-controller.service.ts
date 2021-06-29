@@ -138,12 +138,8 @@ export class MusicControllerService {
       //All icons default to their built-in android equivalents
       //The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
     	
-      //Flaticon author Freepik
-      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
       playIcon: 'media_play',
 
-      //Flaticon author Freepik
-      //https://www.flaticon.com/free-icon/play_748134?term=play&page=1&position=12&page=1&position=12&related_id=748134&origin=search
       pauseIcon: 'media_pause',
       prevIcon: 'media_prev',
       nextIcon: 'media_next',
@@ -219,5 +215,19 @@ export class MusicControllerService {
   setActiveSong(song:Song){
     this.activeSong=song;
     this.changeSong.emit(song);
+  }
+  playLater(song){
+    var currentSongIndex=this.playList.indexOf(this.activeSong);
+    console.log("PLAY LIST",this.playList);
+    console.log("ACTIVE SONG",this.activeSong);
+    
+    if(currentSongIndex!=-1){
+      var moveSong=this.playList.splice(this.playList.indexOf(song),1)[0];
+      this.playList.splice(this.playList.indexOf(this.activeSong)+1,0,moveSong);
+      console.log(this.playList);
+      this._utils.presentToast(this.language.thisSongWillBePlayedNext);
+    }else{
+      this._utils.presentToast(this.language.aSongMustBePlaying);
+    }
   }
 }

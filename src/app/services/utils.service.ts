@@ -46,9 +46,9 @@ export class UtilsService {
     localStorage.setItem('firstUse','false');
   }
   async songSettingMenu(song:Song) {
-    var addLabel=this._language.getActiveLanguage().songsPage.addToPlayList;
-    var cancelLabel=this._language.getActiveLanguage().songsPage.cancel;
-    var playLaterLabel=this._language.getActiveLanguage().songsPage.playLater;
+    var addLabel=this._language.getActiveLanguage().addToPlayList;
+    var cancelLabel=this._language.getActiveLanguage().cancel;
+    var playLaterLabel=this._language.getActiveLanguage().playLater;
 
     const actionSheet = await this.actionSheetController.create({
       header: song.title,

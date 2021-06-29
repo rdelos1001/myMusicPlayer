@@ -16,7 +16,6 @@ import { GetdataService } from 'src/app/services/getdata.service';
   styleUrls: ['./songs.page.scss'],
 })
 export class SongsPage implements OnInit {
-  playList:Song[]=[  ]
   filterSong='';
   allSongs:Song[]=[ 
 /*     {
@@ -51,7 +50,9 @@ export class SongsPage implements OnInit {
                 
                 this.language=this._language.getActiveLanguage();
               }
-              
+  ionViewWillEnter(){
+    this.language= this.language.id!=this._language.getActiveLanguage()?this._language.getActiveLanguage():this.language
+  }
   async ngOnInit() {
     this._musicController.changeSong.subscribe(song=>{
       this.activeSong=song;
@@ -61,27 +62,21 @@ export class SongsPage implements OnInit {
     this.allSongs.push(await this._getData.getSong("assets/mp3/ACDC - Thunderstruck.mp3"));
     this.allSongs.push(await this._getData.getSong("assets/mp3/A day to remember - It's Complicated.mp3"));    
     this.allSongs.push(await this._getData.getSong("assets/mp3/Beret - Si Por Mi Fuera.mp3"));
-
-    this.playList=this.allSongs;    
- /*    this.allSongs.push(...await this._getData.findSongs(this._getData.FILESYSTEM_DIR+"/Music"));
-    this.allSongs.push(...await this._getData.findSongs(this._getData.FILESYSTEM_DIR+"/Download"));
-    this.allSongs.push(...await this._getData.findSongs(this._getData.SDCARD_DIR+"/Music"));
-    this.allSongs.push(...await this._getData.findSongs(this._getData.SDCARD_DIR+"/Download"));
-    
-     */
-
+    var songs:Song[]=[];
+    this.allSongs.forEach((s)=>{
+      songs.push(s);
+    })
+    this._musicController.setPlayList(songs);
     this._utils.hideLoading();
   }
 
   async clickSong(song:Song){
-    this._musicController.setPlayList(this.allSongs);
     this.activeSong=song;
     this.isPlaying=true;
     const modal = await this.modalController.create({
       component: SongPlayerComponent,
       componentProps: { 
-        song:song, 
-        playList:this.playList,
+        song:song,
         viewSongOrPlaySong:false 
       }
     });
@@ -94,14 +89,7 @@ export class SongsPage implements OnInit {
   songSettings(song:Song){
     this._utils.songSettingMenu(song).then((role)=>{
       if(role==="playLater"){
-        var currentSongIndex=this.playList.indexOf(this.activeSong);
-        if(currentSongIndex!=-1){
-          var moveSong=this.playList.splice(this.playList.indexOf(song),1)[0];
-          this.playList.splice(this.playList.indexOf(this.activeSong)+1,0,moveSong);
-          console.log(this.playList)
-        }else{
-          this._utils.presentToast(this.language.aSongMustBePlaying);
-        }
+        this._musicController.playLater(song);
       }
     });
   }
@@ -113,8 +101,7 @@ export class SongsPage implements OnInit {
     const modal = await this.modalController.create({
       component: SongPlayerComponent,
       componentProps: { 
-        song:this.activeSong, 
-        playList:this.playList,
+        song:this.activeSong,
         viewSongOrPlaySong:true 
       }
     });

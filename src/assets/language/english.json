@@ -20,5 +20,8 @@
     "notAvailable":"Not available",
     "theme":"Theme",
     "themeDark":"Dark",
-    "themeLight":"Light"
+    "themeLight":"Light",
+    "filter":"Filter",
+    "thisSongWillBePlayedNext":"This song will be played next"
+
 }

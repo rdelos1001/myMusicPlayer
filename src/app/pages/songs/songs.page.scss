@@ -25,6 +25,7 @@ ion-content{
 }
 ion-button{
     --box-shadow:none;
+    --color:var(--text-color);
 }
 .modCol ion-button{
     font-size: 10px;

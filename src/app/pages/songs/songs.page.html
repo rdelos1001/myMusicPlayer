@@ -7,10 +7,10 @@
 </ion-item>
 
 <ion-content>
-  <ion-list *ngIf="playList.length>0">
+  <ion-list *ngIf="allSongs.length>0">
     <div class="songItem" *ngFor="let song of allSongs | filter:filterSong">
       <ion-item button (click)="clickSong(song)">
-        <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">{{song.name}}</ion-label>
+        <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">{{song.artist}} - {{song.title}}</ion-label>
       </ion-item>
       <ion-button (click)="songSettings(song)">
         <ion-icon name="ellipsis-vertical-outline"></ion-icon>
@@ -22,7 +22,7 @@
   <ion-toolbar>
     <div class="songItem">
       <ion-item button (click)="clickFooter()">
-        <ion-label>{{activeSong.name}}</ion-label>
+        <ion-label>{{activeSong.title}}</ion-label>
       </ion-item>
       <ion-button (click)="togglePlayer(song)">
         <ion-icon name="play"  *ngIf="!isPlaying"></ion-icon>

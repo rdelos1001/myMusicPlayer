@@ -3,34 +3,20 @@ import { Song } from 'src/app/interfaces/song';
 import { IonRange, ModalController, Platform } from '@ionic/angular';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { File } from '@ionic-native/file/ngx';
-import { Plugins } from '@capacitor/core';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { SongPlayerComponent } from 'src/app/components/song-player/song-player.component';
 import { MusicControllerService } from 'src/app/services/music-controller.service';
+import { GetdataService } from 'src/app/services/getdata.service';
 
-const { Filesystem } = Plugins;
 @Component({
   selector: 'app-songs',
   templateUrl: './songs.page.html',
   styleUrls: ['./songs.page.scss'],
 })
 export class SongsPage implements OnInit {
-  playList:Song[]=[
-    {
-      name:"A day to remember - It's Complicated",
-       path:"assets/mp3/A day to remember - It's Complicated.mp3"
-    },
-    {
-      name:"ACDC - Highway to Hell",
-       path:"assets/mp3/ACDC - Highway to Hell.mp3"
-    },
-    {
-      name:"ACDC - Thunderstruck",
-       path:"assets/mp3/ACDC - Thunderstruck.mp3"
-    }
-   ]
+  playList:Song[]=[  ]
   filterSong='';
   allSongs:Song[]=[ 
 /*     {
@@ -60,65 +46,33 @@ export class SongsPage implements OnInit {
               private _language:LanguageService,
               private _theme:ThemeService,
               private _musicController:MusicControllerService,
-              private modalController: ModalController) {
+              private modalController: ModalController,
+              private _getData:GetdataService) {
                 
                 this.language=this._language.getActiveLanguage();
               }
               
-  ngOnInit() {
+  async ngOnInit() {
     this._musicController.changeSong.subscribe(song=>{
       this.activeSong=song;
     })
-    this._utils.presentLoading(this.language.loadingSongs);
-    Filesystem.requestPermissions().then(async (resp)=>{
-      var path="/storage";
-      this.FILESYSTEM_DIR=path+"/emulated/0";
-      await Filesystem.readdir({path})
-      .then((dir)=>{
-        dir.files.forEach((el)=>{
-          if(el!="self" && el!="emulated"){
-            this.SDCARD_DIR=path+"/"+el;
-          }
-        })
-      })
-      .catch((err)=>{
-        console.error("ERROR LEYENDO /storage");
-        console.error(err);
-      });
+    await this._utils.presentLoading(this.language.loadingSongs);
+    this.allSongs.push(await this._getData.getSong("assets/mp3/ACDC - Highway to Hell.mp3"));
+    this.allSongs.push(await this._getData.getSong("assets/mp3/ACDC - Thunderstruck.mp3"));
+    this.allSongs.push(await this._getData.getSong("assets/mp3/A day to remember - It's Complicated.mp3"));    
+    this.allSongs.push(await this._getData.getSong("assets/mp3/Beret - Si Por Mi Fuera.mp3"));
 
-      await this.findSongs(this.SDCARD_DIR+"/Music");
-      await this.findSongs(this.SDCARD_DIR+"/Download");
-      await this.findSongs(this.FILESYSTEM_DIR+"/Music");
-      await this.findSongs(this.FILESYSTEM_DIR+"/Download");
-      
-      this.playList=this.allSongs;
-      this._utils.hideLoading();
-    })
+    this.playList=this.allSongs;    
+ /*    this.allSongs.push(...await this._getData.findSongs(this._getData.FILESYSTEM_DIR+"/Music"));
+    this.allSongs.push(...await this._getData.findSongs(this._getData.FILESYSTEM_DIR+"/Download"));
+    this.allSongs.push(...await this._getData.findSongs(this._getData.SDCARD_DIR+"/Music"));
+    this.allSongs.push(...await this._getData.findSongs(this._getData.SDCARD_DIR+"/Download"));
+    
+     */
+
+    this._utils.hideLoading();
   }
 
-  async findSongs(path:string){
-    Filesystem.readdir({path}).then((dir)=>{
-      dir.files.forEach(async(el)=>{
-        if(el.endsWith('.mp3')){
-          var win:any=window;
-          let songPath=win.Ionic.WebView.convertFileSrc(path+"/"+el.replace('%',escape("%")));
-          this.allSongs.push({name:el.substring(0,el.lastIndexOf('.')),path:songPath})
-          console.log(el.substring(0,el.lastIndexOf('.'))+" - RUTA:"+songPath)
-/*           await Filesystem.stat({ path:path+"/" + el })
-          .then((fileInfo)=>{
-            var win: any = window;
-            fileInfo.uri=win.Ionic.WebView.convertFileSrc(fileInfo.uri);
-          }).catch((err)=>{
-            console.error("ERROR EN FILEINFO",err);
-          }); */
-        }
-      })
-    })
-    .catch((err)=>{
-      console.error("ERROR EN EL DIRECTORIO ",path);
-      console.error(err);
-    });
-  }
   async clickSong(song:Song){
     this._musicController.setPlayList(this.allSongs);
     this.activeSong=song;

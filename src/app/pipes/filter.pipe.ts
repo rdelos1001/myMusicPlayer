@@ -8,8 +8,11 @@ export class FilterPipe implements PipeTransform {
 
   transform(value:Song[], arg: string):any {
     var resultSongs=[];
+    if(!arg){
+      return value
+    }
     for (const song of value) {
-      if(song.name.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase())>-1){
+      if(song.title.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase())>-1){
         resultSongs.push(song);
       };
     };

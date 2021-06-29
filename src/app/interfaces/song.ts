@@ -1,4 +1,9 @@
+import { IPicture } from "music-metadata-browser";
+
 export interface Song {
-    name:string,
-    path:string
+    title:string,
+    path:string,
+    artist?:string,
+    genre?:string,
+    cover?:IPicture
 }

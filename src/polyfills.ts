@@ -63,3 +63,7 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+//Para la librería music-metadata-browser
+ global.Buffer = global.Buffer || require('buffer').Buffer;
+ import * as process from 'process';
+window['process'] = process;

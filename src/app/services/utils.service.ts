@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ActionSheetController, LoadingController, ToastController } from '@ionic/angular';
 import { Song } from '../interfaces/song';
 import { LanguageService } from './language.service';
+import { Plugins } from '@capacitor/core';
+const {Filesystem} =Plugins
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +51,7 @@ export class UtilsService {
     var playLaterLabel=this._language.getActiveLanguage().songsPage.playLater;
 
     const actionSheet = await this.actionSheetController.create({
-      header: song.name,
+      header: song.title,
       buttons: [/* {
         text: addLabel,
         icon: 'share',

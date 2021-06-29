@@ -70,8 +70,6 @@ export class MusicControllerService {
         index=this.playList.indexOf(this.activeSong);
         break;
     }
-    console.log("index anterior canción-> "+this.playList.indexOf(this.activeSong));
-    console.log("index proxima canción -> "+index);
     if(index==this.playList.length){
      currentSong= await this.start(this.playList[0]);
     }else{
@@ -120,7 +118,7 @@ export class MusicControllerService {
   createMusicControls(song:Song){
     this.musicControls.destroy();
     this.musicControls.create({
-      track       : song.name,		// optional, default : ''
+      track       : song.title,		// optional, default : ''
       artist      : '',						// optional, default : ''
       album       : '',     // optional, default: ''
       cover       : '../../assets/icon/icon.png',		// optional, default : nothing

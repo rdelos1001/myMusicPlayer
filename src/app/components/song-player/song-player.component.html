@@ -3,12 +3,13 @@
     <ion-button (click)="dismiss()" fill="clear" slot="start">
       <ion-icon name="caret-back-outline"></ion-icon>
     </ion-button>
-    <ion-title>{{song.name}}</ion-title>
+    <ion-title>{{song.title}}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-no-border">
   <div>
-    <img src="/assets/icon/icon.png" width="50%" alt="">
+    <img *ngIf="!song.cover" src="/assets/icon/icon.png" width="50%" alt="">        
+    <img *ngIf="song.cover" src="data:{{ song.cover.format }};base64,{{song.cover.data.toString('base64')}}" width="50%">
   </div>
 </ion-content>
 <ion-footer>

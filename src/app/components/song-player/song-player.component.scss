@@ -18,7 +18,7 @@ ion-label{
     color: var(--text-color)
 }
 img{
-    border-radius: 50px;
+    border-radius: 10%;
 }
 h1{
     text-align: center;
@@ -30,11 +30,12 @@ ion-button{
 ion-icon{
     color: var(--button-color);
 }
+//Elimina una pequeña línea que aparecía sobre el footer
+.footer-md::before{
+    height: 0;
+}
 ion-footer{
     ion-toolbar{
-        ion-row{
-            margin-top: 1pc;
-        }
         border-top: 2px solid var(--decorative-color);
         border-radius: 10% 10% 0 0;
     }

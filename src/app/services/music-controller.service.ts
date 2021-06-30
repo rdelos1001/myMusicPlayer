@@ -1,6 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
 import { Howl, Howler } from 'howler';
+import { type } from 'node:os';
+import { BehaviorSubject } from 'rxjs';
 import { Song } from '../interfaces/song';
 import { LanguageService } from './language.service';
 import { UtilsService } from './utils.service';
@@ -9,8 +11,11 @@ import { UtilsService } from './utils.service';
   providedIn: 'root'
 })
 export class MusicControllerService {
-  player:Howl= null;
-  isPlaying:boolean=false;
+  public player:Howl= null;
+  private isPlaying:boolean=false;
+  $changeSong:EventEmitter<Song>= new EventEmitter<Song>();
+  $allSongs:BehaviorSubject<Song[]>= new BehaviorSubject<Song[]>([]);
+
   progress=0;
   mod:number=1;
   currentTime={ 
@@ -22,14 +27,14 @@ export class MusicControllerService {
     seconds:""
   };
   toggleProgressVolume: boolean;
-  activeSong: Song;
-  changeSong:EventEmitter<Song>= new EventEmitter<Song>()
-  playList: Song[];
+  private activeSong: Song;
+  playList:Song[];
+
   language:any;
   constructor(private musicControls:MusicControls,
               private _utils:UtilsService,
               private _language:LanguageService) {
-                this.language=this._language.getActiveLanguage()
+                this.language=this._language.getActiveLanguage();
   }
   start(song:Song):Promise<Song>{
     return new Promise<Song>((resolve)=>{
@@ -41,8 +46,8 @@ export class MusicControllerService {
         html5:true,
         onplay:()=>{
           this.setActiveSong(song);
-          this.isPlaying=true;
           this.totalTime= this.getTime(this.player.duration());
+          this.isPlaying=true;
           resolve(song);
         },
         onend:()=>{
@@ -212,22 +217,34 @@ export class MusicControllerService {
     }
     return mod;
   }
-  setActiveSong(song:Song){
-    this.activeSong=song;
-    this.changeSong.emit(song);
-  }
   playLater(song){
-    var currentSongIndex=this.playList.indexOf(this.activeSong);
-    console.log("PLAY LIST",this.playList);
-    console.log("ACTIVE SONG",this.activeSong);
-    
+    var currentSongIndex=this.playList.indexOf(this.activeSong);    
     if(currentSongIndex!=-1){
       var moveSong=this.playList.splice(this.playList.indexOf(song),1)[0];
       this.playList.splice(this.playList.indexOf(this.activeSong)+1,0,moveSong);
-      console.log(this.playList);
       this._utils.presentToast(this.language.thisSongWillBePlayedNext);
     }else{
       this._utils.presentToast(this.language.aSongMustBePlaying);
     }
+  }
+  setActiveSong(song:Song){
+    this.activeSong=song;
+    this.$changeSong.emit(song);
+  }
+  getActiveSong():Song{
+    return this.activeSong;
+  }
+  getAllSongs(){
+    return this.$allSongs.asObservable();
+  }
+  addAllSongs(songs:Song[]|Song){
+    var allsongs=this.$allSongs.getValue();
+    var aux:any=songs;
+    if(JSON.stringify(songs).charAt(0)=='['){
+      allsongs.push(...aux);
+    }else if(JSON.stringify(songs).charAt(0)=='{'){
+      allsongs.push(aux);
+    }    
+    this.$allSongs.next(allsongs);
   }
 }

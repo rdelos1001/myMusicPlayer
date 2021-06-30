@@ -44,6 +44,19 @@ ion-button{
     position: absolute;
     right: 0;
 }
-ion-footer{
-    border-top: 1px solid var(--decorative-color);
+#actionButtons{
+    display: flex;
+    justify-content: space-between;
+}
+#loading{
+    margin: 0 1pc;
+    padding: 0.5pc 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background:var(--background-color);
+
+    p{
+        color: var(--text-color);
+    }
 }

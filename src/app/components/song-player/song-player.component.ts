@@ -4,8 +4,8 @@ import { Song } from 'src/app/interfaces/song';
 import { LanguageService } from 'src/app/services/language.service';
 import { MusicControllerService } from 'src/app/services/music-controller.service';
 import { ThemeService } from 'src/app/services/theme.service';
-import { UtilsService } from 'src/app/services/utils.service';
 import { ViewPlayListComponent } from '../view-play-list/view-play-list.component';
+import * as musicMetadata from 'music-metadata-browser';
 
 @Component({
   selector: 'app-song-player',
@@ -15,14 +15,13 @@ import { ViewPlayListComponent } from '../view-play-list/view-play-list.componen
 export class SongPlayerComponent implements OnInit {
   
   @Input() song:Song;
-  @Input() playList:Song[];
   @Input() viewSongOrPlaySong:boolean;
   @ViewChild('volumeRange',{static:false}) volumeRange:ElementRef;
   @ViewChild('progressRange',{static:false}) progressRange:IonRange;
-
+  songCoverLoading:boolean=false;
   isPlaying:boolean=false;
   toggleProgressVolume: boolean;
-  progress=0;
+  public progress=0;
   volume=100;
   language;
   mod:number=1;
@@ -38,22 +37,33 @@ export class SongPlayerComponent implements OnInit {
               private _musicController:MusicControllerService,
               private _language:LanguageService,
               private _theme:ThemeService
-    ) { 
-      this.language=_language.getActiveLanguage();
-    }
+    ) 
+  { 
+    this.language=_language.getActiveLanguage();
+  }
   async ngOnInit() {
     if(!this.viewSongOrPlaySong){
       await this.start(this.song);
     }
+    this.songCoverLoading=true;
+    musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
+      this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
+      this.songCoverLoading=false;
+    })
     this.totalTime=this._musicController.totalTime;
-    this.isPlaying=this._musicController.isPlaying;
     this.updateProgress();
-    this._musicController.changeSong.subscribe((song)=>{
-      this.song=song
+    this._musicController.$changeSong.subscribe((song)=>{
+      this.song=song;
+      this.songCoverLoading=true;
+      musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
+        this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
+        this.songCoverLoading=false;
+      })
     });
   }
   async start(song:Song){
     await this._musicController.start(song);
+    this.isPlaying=true;
   }
 
   dismiss(){
@@ -65,7 +75,7 @@ export class SongPlayerComponent implements OnInit {
 
   togglePlayer(){
     this._musicController.togglePlayer();
-    this.isPlaying=this._musicController.isPlaying;
+    this.isPlaying=this._musicController.player.playing();
   }
   
   seek(){
@@ -90,13 +100,10 @@ export class SongPlayerComponent implements OnInit {
   toggleVolumeBar(){
     this.toggleProgressVolume=!this.toggleProgressVolume;
   }
-
   async viewPlayList(){
       const modal = await this.modalController.create({
         component:ViewPlayListComponent,
-        componentProps:{
-          playList:this.playList
-        },
+        componentProps:{        },
         cssClass:"modal",
         mode:"ios",
         swipeToClose:true,
@@ -106,15 +113,12 @@ export class SongPlayerComponent implements OnInit {
       await modal.present();
 
       const {data} = await modal.onDidDismiss();
-      if(data){
-        this.playList=data
-      }
-      console.log(data)
   }
   prev(){
     this._musicController.prev();
   }
   next(){
     this._musicController.next();
+    this.isPlaying=true;
   }
 }

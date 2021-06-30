@@ -22,6 +22,9 @@
     "themeDark":"Dark",
     "themeLight":"Light",
     "filter":"Filter",
-    "thisSongWillBePlayedNext":"This song will be played next"
-
+    "order":"Order",
+    "thisSongWillBePlayedNext":"This song will be played next",
+    "title":"Title",
+    "artist":"Artist",
+    "gender":"Gender"
 }

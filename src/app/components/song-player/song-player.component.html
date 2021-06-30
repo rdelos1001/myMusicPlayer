@@ -8,8 +8,12 @@
 </ion-header>
 <ion-content class="ion-no-border">
   <div>
-    <img *ngIf="!song.cover" src="/assets/icon/iconTransparent.png" width="50%" alt="">        
-    <img *ngIf="song.cover" src="data:{{ song.cover.format }};base64,{{song.cover.data.toString('base64')}}" width="50%">
+    <img *ngIf="!songCoverLoading && !song.cover" src="/assets/icon/iconTransparent.png" width="50%" alt="">
+    <ion-spinner *ngIf="songCoverLoading" [color]="this._theme.getColorStr()" name="crescent" class="spinner-large"></ion-spinner>        
+    <img *ngIf="!songCoverLoading &&  song.cover"
+          src="data:{{ song.cover.format }};base64,{{song.cover.data.toString('base64')}}" 
+          onerror="this.src='/assets/icon/iconTransparent.png';"
+          width="50%">
   </div>
 </ion-content>
 <ion-footer>

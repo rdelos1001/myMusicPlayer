@@ -15,6 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { MusicControls } from '@ionic-native/music-controls/ngx';
 import { Toast } from '@ionic-native/toast/ngx';
+import { SongPlayerComponent } from './components/song-player/song-player.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { Toast } from '@ionic-native/toast/ngx';
     Toast,
     MusicControls,
     AppVersion,
+    SongPlayerComponent,
     {
       provide: RouteReuseStrategy, useClass: IonicRouteStrategy
     }

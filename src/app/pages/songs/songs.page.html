@@ -2,21 +2,31 @@
 
 <ion-item id="shearchInput">
   <ion-icon name="search-outline" slot="start"></ion-icon>
-  <ion-input type="text" [(ngModel)]="filterSong" name="filterSong" [placeholder]="language.search"></ion-input>
+  <ion-input type="text" [(ngModel)]="filterSong" (ionChange)="highlight()" name="filterSong" [placeholder]="language.search"></ion-input>
   <ion-icon name="close-circle-outline" slot="end" (click)="filterSong=''"></ion-icon>
 </ion-item>
 
 <ion-content>
-  <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
-    <ion-icon slot="start" name="filter"></ion-icon>
-    {{language.filter}}
-  </ion-button>
-  <ion-list *ngIf="allSongs.length>0">
-    <div class="songItem" *ngFor="let song of allSongs | filter:filterSong">
+  <div id="actionButtons">
+    <ion-button (click)="order()" fill="clear" mode="ios" shape="round">
+      <ion-icon slot="start" name="filter"></ion-icon>
+      {{language.order}}: {{orderedBy}}
+    </ion-button>
+    <ion-button (click)="filter()" fill="clear" mode="ios" shape="round">
+      <ion-icon slot="start" src="assets/icon/filter.svg"></ion-icon>
+      {{language.filter}}
+    </ion-button>
+  </div>
+  <div id="loading" *ngIf="isLoading">
+    <p>Buscando canciones...</p>
+    <ion-progress-bar [color]="this._theme.getColorStr()" type="indeterminate"></ion-progress-bar>
+  </div>
+  <ion-list *ngIf="playList && playList.length>0">
+    <div class="songItem" *ngFor="let song of playList | filter:filterSong">
       <ion-item button (click)="clickSong(song)">
         <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">
-          <h2>{{song.title}}</h2>
-          <p>{{song.artist}}</p>
+          <h2 #h2>{{song.title}}</h2>
+          <p  #p>{{song.artist}} - {{song.genre}}</p>
         </ion-label>
         <img *ngIf="song==activeSong && isPlaying" src="/assets/icon/music.gif" width="20px" alt="">
       </ion-item>
@@ -27,6 +37,7 @@
   </ion-list>
 </ion-content>
 <ion-footer *ngIf="activeSong">
+  <ion-progress-bar [color]="this._theme.getColorStr()" [value]="progress"></ion-progress-bar>
   <ion-toolbar>
     <div class="songItem">
       <ion-item button (click)="clickFooter()">

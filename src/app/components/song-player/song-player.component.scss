@@ -19,6 +19,7 @@ ion-label{
 }
 img{
     border-radius: 10%;
+    max-width: 220px;
 }
 h1{
     text-align: center;
@@ -52,4 +53,8 @@ ion-range{
         position: absolute;
         right: 0;
     }
+}
+.spinner-large {
+    width: 100px;
+    height: 100px;
 }

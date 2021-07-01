@@ -11,7 +11,7 @@
     <ion-reorder-group [disabled]="false"
                         (ionItemReorder)="reorder($event)">
         <ion-item *ngFor="let song of playList">
-          <ion-label>{{song.title}}</ion-label>
+          <ion-label [class]="song.path==selectedSongPath?'activeSong':'nonActiveSong'">{{song.title}}</ion-label>
           <ion-reorder slot="end">
           </ion-reorder>
         </ion-item>

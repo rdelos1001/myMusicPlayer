@@ -53,12 +53,14 @@ export class SongPlayerComponent implements OnInit {
     this.totalTime=this._musicController.totalTime;
     this.updateProgress();
     this._musicController.$changeSong.subscribe((song)=>{
-      this.song=song;
-      this.songCoverLoading=true;
-      musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
-        this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
-        this.songCoverLoading=false;
-      })
+      if(song.path!=this.song.path){
+        this.song=song;
+        this.songCoverLoading=true;
+        musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
+          this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
+          this.songCoverLoading=false;
+        })
+      }
     });
   }
   async start(song:Song){

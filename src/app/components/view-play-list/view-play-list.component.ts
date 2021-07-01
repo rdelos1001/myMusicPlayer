@@ -13,6 +13,7 @@ export class ViewPlayListComponent implements OnInit {
 
   playList:Song[]
   language:any;
+  selectedSongPath:string;
   constructor(private modalController: ModalController,
               private _language:LanguageService,
               private _musicController:MusicControllerService) {
@@ -21,7 +22,10 @@ export class ViewPlayListComponent implements OnInit {
 
   
   ngOnInit() {
-    this.playList=this._musicController.playList;
+    this._musicController.$allSongs.subscribe((allsongs)=>{
+      this.playList=this._musicController.playList;
+    })
+    this.selectedSongPath= this._musicController.getActiveSong().path;
   }
   
 

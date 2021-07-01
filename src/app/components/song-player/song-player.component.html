@@ -7,13 +7,19 @@
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-no-border">
-  <div>
-    <img *ngIf="!songCoverLoading && !song.cover" src="/assets/icon/iconTransparent.png" width="50%" alt="">
+  <div id="artistGenreLbl">
+    <p *ngIf="song.artists">{{language.artist}}: <span *ngFor="let artist of song.artists; index as i"> {{artist}} <span *ngIf="i<song.artists.length-1">,</span></span></p>
+    <p *ngIf="song.genres" >{{language.genre}}: <span  *ngFor="let genre of song.genres; index as i"  > {{genre}} <span  *ngIf="i<song.genres.length-1">,</span></span></p>
+  </div>
+    
+  <div id="imgDiv">
+    <img *ngIf="!songCoverLoading && !song.cover" src="/assets/icon/iconTransparent.png" width="50%" alt="portada de la canción">
     <ion-spinner *ngIf="songCoverLoading" [color]="this._theme.getColorStr()" name="crescent" class="spinner-large"></ion-spinner>        
     <img *ngIf="!songCoverLoading &&  song.cover"
           src="data:{{ song.cover.format }};base64,{{song.cover.data.toString('base64')}}" 
           onerror="this.src='/assets/icon/iconTransparent.png';"
-          width="50%">
+          width="50%"
+          alt="portada de la canción">
   </div>
 </ion-content>
 <ion-footer>

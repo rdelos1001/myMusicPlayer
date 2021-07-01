@@ -3,3 +3,9 @@ ion-header > ion-toolbar {
         --color: white;
     }
 }
+.activeSong{
+    color: var(--text-color-selected);
+}
+.nonActiveSong{
+    color:black;
+}

@@ -41,6 +41,7 @@ export class SongsPage implements OnInit {
     this.language= this.language.id!=this._language.getActiveLanguage()?this._language.getActiveLanguage():this.language
   }
   async ngOnInit() {
+    await this._getData.requestFilesystemPermission()
     this._musicController.$changeSong.subscribe(song=>{
       this.activeSong=song;
     });
@@ -127,15 +128,15 @@ export class SongsPage implements OnInit {
       this.orderedBy=this._language.getActiveLanguage().title;
     }else if(filter=="artist"){
       this.playList.sort((a,b)=>{
-        var textA = a.artist.toLowerCase();
-        var textB = b.artist.toLowerCase();
+        var textA = a.artists[0].toLowerCase();
+        var textB = b.artists[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().artist;
-    }else if(filter=="gender"){
+    }else if(filter=="genre"){
       this.playList.sort((a,b)=>{
-        var textA = a.genre.toLowerCase();
-        var textB = b.genre.toLowerCase();
+        var textA = a.genres[0].toLowerCase();
+        var textB = b.genres[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().gender;

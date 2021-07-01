@@ -26,7 +26,8 @@
       <ion-item button (click)="clickSong(song)">
         <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">
           <h2 #h2>{{song.title}}</h2>
-          <p  #p>{{song.artist}} - {{song.genre}}</p>
+          <p #p><span *ngFor="let artist of song.artists; index as i"> {{artist}} <span *ngIf="i<song.artists.length-1">,</span><span *ngIf="i>=song.artists.length-1"> - </span></span>
+          <span *ngFor="let genre of song.genres; index as i"  > {{genre}} <span  *ngIf="i<song.genres.length-1">,</span></span></p>      
         </ion-label>
         <img *ngIf="song==activeSong && isPlaying" src="/assets/icon/music.gif" width="20px" alt="">
       </ion-item>

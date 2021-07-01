@@ -7,14 +7,14 @@ ion-header > ion-toolbar{
 ion-content{
     background: var(--background-color);
     --background: var(--background-color);
-    div{
+    #imgDiv{
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 }
-ion-label{
+ion-label,p{
     color: var(--text-color)
 }
 img{
@@ -57,4 +57,10 @@ ion-range{
 .spinner-large {
     width: 100px;
     height: 100px;
+}
+#artistGenreLbl{
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
 }

@@ -28,7 +28,7 @@ export class MusicControllerService {
   };
   toggleProgressVolume: boolean;
   private activeSong: Song;
-  playList:Song[];
+  playList:Song[]=[];
 
   language:any;
   constructor(private musicControls:MusicControls,
@@ -199,9 +199,6 @@ export class MusicControllerService {
     }
     this.isPlaying=!this.isPlaying;
   }
-  setPlayList(playList:Song[]){
-    this.playList=playList;
-  }
   setMod(mod:number):number{
     this.mod=mod;
     switch(mod){
@@ -246,5 +243,17 @@ export class MusicControllerService {
       allsongs.push(aux);
     }    
     this.$allSongs.next(allsongs);
+  }
+  setPlayList(playList:Song[]){
+    this.playList=playList;
+  }
+  addSongToPlayList(songs:Song[]|Song){
+    var allsongs=this.playList;
+    var aux:any=songs;
+    if(JSON.stringify(songs).charAt(0)=='['){
+      allsongs.push(...aux);
+    }else if(JSON.stringify(songs).charAt(0)=='{'){
+      allsongs.push(aux);
+    }    
   }
 }

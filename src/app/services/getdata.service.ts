@@ -20,7 +20,9 @@ export class GetdataService {
       for (const el of files) {
         var win:any=window;
         let songPath:string=win.Ionic.WebView.convertFileSrc(path+"/"+el.replace('%',escape("%")));
-        this._musicCtrl.addAllSongs( await this.getSong(songPath) );
+        let song = await this.getSong(songPath)
+        this._musicCtrl.addAllSongs( song );
+        this._musicCtrl.addSongToPlayList(song);
       }
     }).catch((e:Error)=>{
       console.error("ERROR EN DIRECTORIO "+path+"= "+e.message);
@@ -32,17 +34,24 @@ export class GetdataService {
     let metadata=await musicMetadata.fetchFromUrl(filepath,{
       skipCovers:true,
       skipPostHeaders:true
-    });
+    });    
+    let artists = metadata.common.artists? metadata.common.artists:["unknown"];
+    let title  = metadata.common.title? metadata.common.title:filepath.substring(filepath.lastIndexOf("/")+1,filepath.length-4);
+    let genres  = metadata.common.genre? metadata.common.genre:["unknown"];
+    console.log("GENRES-> "+JSON.stringify(metadata.common.genre));
     
-    let artist = metadata.common.artist? metadata.common.artist:"unknown"
-    let title  = metadata.common.title? metadata.common.title:filepath.substring(filepath.lastIndexOf("/")+1,filepath.length-4)
-    let genre  = metadata.common.genre? metadata.common.genre[0]:"unknown"
     let song:Song={
       path:filepath,
       title,
-      artist,
-      genre
+      artists,
+      genres
     }    
     return song
+  }
+  async requestFilesystemPermission(){
+    return new Promise<boolean>(async (resolve)=>{
+      await Filesystem.requestPermissions();
+      resolve(true)
+    })
   }
 }

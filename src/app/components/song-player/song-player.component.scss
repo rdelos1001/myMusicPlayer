@@ -1,8 +1,5 @@
-ion-header > ion-toolbar{
-    ion-button,ion-title,ion-icon{
-        --color: white;
-        color: white;
-    }
+ion-header > ion-toolbar > ion-button > ion-icon{
+    color: white;
 }
 ion-content{
     background: var(--background-color);
@@ -62,5 +59,6 @@ ion-range{
     position: absolute;
     top: 0;
     display: flex;
+    width: 30%;
     flex-direction: column;
 }

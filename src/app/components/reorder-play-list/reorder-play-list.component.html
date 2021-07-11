@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-button (click)="dismiss()" fill="clear">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+    <ion-title>{{language.playList}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-reorder-group [disabled]="false"
+                        (ionItemReorder)="reorder($event)">
+        <ion-item *ngFor="let song of playList">
+          <ion-label [class]="song.path==selectedSongPath?'activeSong':'nonActiveSong'">{{song.title}}</ion-label>
+          <ion-reorder slot="end">
+            <ion-icon name="menu-outline"></ion-icon>
+          </ion-reorder>
+        </ion-item>
+    </ion-reorder-group>
+  </ion-list>
+</ion-content>

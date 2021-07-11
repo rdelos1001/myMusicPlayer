@@ -4,7 +4,7 @@ import { Song } from 'src/app/interfaces/song';
 import { LanguageService } from 'src/app/services/language.service';
 import { MusicControllerService } from 'src/app/services/music-controller.service';
 import { ThemeService } from 'src/app/services/theme.service';
-import { ViewPlayListComponent } from '../view-play-list/view-play-list.component';
+import { ReorderPlayListComponent } from '../reorder-play-list/reorder-play-list.component';
 import * as musicMetadata from 'music-metadata-browser';
 
 @Component({
@@ -15,7 +15,7 @@ import * as musicMetadata from 'music-metadata-browser';
 export class SongPlayerComponent implements OnInit {
   
   @Input() song:Song;
-  @Input() viewSongOrPlaySong:boolean;
+  @Input() playSong:boolean;
   @ViewChild('volumeRange',{static:false}) volumeRange:ElementRef;
   @ViewChild('progressRange',{static:false}) progressRange:IonRange;
   songCoverLoading:boolean=false;
@@ -38,13 +38,14 @@ export class SongPlayerComponent implements OnInit {
               private _language:LanguageService,
               private _theme:ThemeService
     ) 
-  { 
-    this.language=_language.getActiveLanguage();
+    { 
+      this.language=_language.getActiveLanguage();
   }
   async ngOnInit() {
-    if(!this.viewSongOrPlaySong){
-      await this.start(this.song);
+    if(this.playSong){
+      await this._musicController.start(this.song);
     }
+    this.isPlaying=this._musicController.player.playing();    
     this.songCoverLoading=true;
     musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
       this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
@@ -55,6 +56,7 @@ export class SongPlayerComponent implements OnInit {
     this._musicController.$changeSong.subscribe((song)=>{
       if(song.path!=this.song.path){
         this.song=song;
+        this.totalTime=this._musicController.totalTime;
         this.songCoverLoading=true;
         musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
           this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
@@ -62,10 +64,6 @@ export class SongPlayerComponent implements OnInit {
         })
       }
     });
-  }
-  async start(song:Song){
-    await this._musicController.start(song);
-    this.isPlaying=true;
   }
 
   dismiss(){
@@ -103,18 +101,16 @@ export class SongPlayerComponent implements OnInit {
     this.toggleProgressVolume=!this.toggleProgressVolume;
   }
   async viewPlayList(){
-      const modal = await this.modalController.create({
-        component:ViewPlayListComponent,
-        componentProps:{        },
-        cssClass:"modal",
-        mode:"ios",
-        swipeToClose:true,
-        showBackdrop:true
-      });
-    
-      await modal.present();
-
-      const {data} = await modal.onDidDismiss();
+    const modal = await this.modalController.create({
+      component:ReorderPlayListComponent,
+      componentProps:{        },
+      cssClass:"modal",
+      mode:"ios",
+      swipeToClose:true,
+      showBackdrop:true
+    });
+    await modal.present();
+    await modal.onDidDismiss();
   }
   prev(){
     this._musicController.prev();

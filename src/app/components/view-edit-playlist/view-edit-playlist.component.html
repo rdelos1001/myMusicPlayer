@@ -1,0 +1,55 @@
+<ion-content
+[scrollEvents]="true"
+(ionScroll)="logScrolling($event)"
+>
+  <div>
+    <div class="header">
+      <ion-row >
+        <ion-col size="12">
+          <div id="title" #title>
+            <ion-button (click)="dismiss()" fill="clear">
+              <ion-icon slot="icon-only" name="chevron-down-outline"></ion-icon>
+            </ion-button>
+            <ion-label id="pl_name">{{pl.name}}</ion-label>
+            <div></div>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="3">
+          <div class="imgDiv">
+            <ion-img *ngIf="pl.cover" src="data:{{ pl.cover.format }};base64,{{pl.cover.data.toString('base64')}}" 
+            onerror="this.src='/assets/icon/icon.png';"
+            alt="portada de la canción"></ion-img>
+            <ion-img *ngIf="!pl.cover" src="/assets/icon/icon.png"></ion-img>
+          </div>
+        </ion-col>
+        <ion-col>
+          <h6>{{pl.name}}</h6>
+          <p>Total de canciones: {{pl.songsPath.length}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="6">
+          <ion-button (click)="delPl()" fill="clear" shape="round">
+            <ion-icon slot="start" name="trash"></ion-icon>
+            {{language.delete}}
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button (click)="playPlayList()" fill="clear" shape="round">
+            <ion-icon name="play-circle-outline"></ion-icon>
+            {{language.play}}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+    <div class="body" id="body">
+      <ion-list *ngIf="songs.length>0">
+        <ion-item *ngFor="let s of songs; index as i">
+          <ion-label>{{i+1}}- {{s.title}}</ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

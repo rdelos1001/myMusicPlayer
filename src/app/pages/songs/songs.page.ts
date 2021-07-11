@@ -1,13 +1,17 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
 import { Plugins } from '@capacitor/core';
-import { IonRange, ModalController } from '@ionic/angular';
+import { IonRange, IonSlides, ModalController } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { SongPlayerComponent } from 'src/app/components/song-player/song-player.component';
 import { MusicControllerService } from 'src/app/services/music-controller.service';
 import { GetdataService } from 'src/app/services/getdata.service';
+import { PlayList } from 'src/app/interfaces/PlayList';
+import * as musicMetadata from 'music-metadata-browser';
+import { ReorderPlayListComponent } from 'src/app/components/reorder-play-list/reorder-play-list.component';
+import { ViewEditPlaylistComponent } from 'src/app/components/view-edit-playlist/view-edit-playlist.component';
 const { Filesystem } = Plugins;
 
 @Component({
@@ -18,12 +22,14 @@ const { Filesystem } = Plugins;
 export class SongsPage implements OnInit {
   filterSong='';
   orderedBy="";
-  playList:Song[]=[];
+  allSongs:Song[]=[];
   activeSong:Song =null;
   isPlaying:boolean=false;
   isLoading:boolean=false;
   language;
   progress:number=0;
+  plList:PlayList[]=[];
+  isCoverLoading:boolean=false;
   @ViewChild('volumeRange',{static:false}) volumeRange:ElementRef;
   @ViewChild('progressRange',{static:false}) progressRange:IonRange;
   @ViewChildren('h2')h2lbls:QueryList<ElementRef>;
@@ -34,26 +40,49 @@ export class SongsPage implements OnInit {
               private _musicController:MusicControllerService,
               private modalController: ModalController,
               private _getData:GetdataService) {
-                
                 this.language=this._language.getActiveLanguage();
               }
   ionViewWillEnter(){    
     this.language= this.language.id!=this._language.getActiveLanguage()?this._language.getActiveLanguage():this.language
   }
   async ngOnInit() {
+
     await this._getData.requestFilesystemPermission()
     this._musicController.$changeSong.subscribe(song=>{
       this.activeSong=song;
+      this.isPlaying=this._musicController.player.playing();
+      this.updateProgress();
     });
-    this._musicController.getAllSongs().subscribe((allsongs)=>{
-      this.playList=allsongs;
+    this._getData.getAllSongs().subscribe((allsongs)=>{
+      for (const song of allsongs) {
+        const songFormat = song.path.substring(song.path.lastIndexOf('.')+1);
+        if(this._getData.formatsSelected.includes(songFormat) && !this.allSongs.includes(song) ){
+          this.allSongs.push(song);
+        }
+      }
     });
-/*     this.playList.push(await this._getData.getSong("assets/mp3/ACDC - Highway to Hell.mp3"));
-    this.playList.push(await this._getData.getSong("assets/mp3/ACDC - Thunderstruck.mp3"));
-    this.playList.push(await this._getData.getSong("assets/mp3/A day to remember - It's Complicated.mp3"));    
-    this.playList.push(await this._getData.getSong("assets/mp3/Beret - Si Por Mi Fuera.mp3"));
- */
+    this._getData.getPlayListsObs().subscribe((allPlaylist)=>{
+      this.plList=allPlaylist;
+    })
     this.isLoading=true;
+    const localFiles=[
+      "assets/mp3/ACDC - Highway to Hell.mp3",
+      "assets/mp3/oggExample.ogg",
+      "assets/mp3/opusExample.opus",
+      "assets/mp3/accExample.aac",
+      "assets/mp3/m4aExample.m4a",
+      "assets/mp3/mp4Example.mp4",
+      "assets/mp3/wavExample.wav",
+      "assets/mp3/webmExample.webm",
+      "assets/mp3/AC Valhalla - My Mother Told Me.mp3",
+      "assets/mp3/Evanescence - Bring Me To Life.mp3"
+    ]
+    for (const f of localFiles) {
+      const song=await this._getData.getSong(f);
+      this._getData.addAllSongs(song);
+    }
+    
+    this.loadPLCover();
     var files =(await Filesystem.readdir({path:"/storage"})).files;
     const SDCARD_DIR="/storage/"+files.find((el)=>el!="self"&&el!="emulated");
     this._getData.SDCARD_DIR=SDCARD_DIR;
@@ -68,33 +97,52 @@ export class SongsPage implements OnInit {
     for (const dir of dirs) {
       await this._getData.findSongs(dir);
     };
-
+    
+    this.allSongs=this._getData.$allSongs.getValue();
+    this.loadFileSystemFilter();
     this.order("title");
-    this._utils.presentToast("Canciones encontradas")
+    this._utils.presentToast("Canciones encontradas");
     this.isLoading=false;
   }
   async clickSong(song:Song){
-    this.activeSong=song;
-    this.isPlaying=true;
-    const modal = await this.modalController.create({
+    this._musicController.setPlayList(this._getData.$allSongs.getValue());
+      const modal = await this.modalController.create({
       component: SongPlayerComponent,
       componentProps: {
-        song:song,
-        viewSongOrPlaySong:false 
+        song,
+        playSong:true 
       }
     });
     await modal.present();
-    await modal.onDidDismiss();
+    await modal.onWillDismiss();
     this.activeSong=this._musicController.getActiveSong();
     this.isPlaying=this._musicController.player?this._musicController.player.playing():false;
-    this.updateProgress();
   }
-  songSettings(song:Song){
-    this._utils.songSettingMenu(song).then((role)=>{
-      if(role==="playLater"){
-        this._musicController.playLater(song);
+  async songSettings(song:Song){
+    let role = await this._utils.songSettingMenu(song);
+    if(role==="playLater"){
+      this._musicController.playLater(song);
+    }else if(role==="delSong"){
+      this._getData.delSong(song);
+    }else if(role==="addToPlayList"){
+      let role=await this._utils.showAddToPlayListMenu(this._getData.getPlayLists());
+      if(role=="newPlayList"){
+        let name =await this._utils.newPlayListAlert();
+        if(name){
+          if(name.length==0){
+            this._utils.presentAlert("Error",this._language.getActiveLanguage().nameOfPlayListNotEmpty)
+          }else{
+            let newPlayList=this._getData.newPlayList(name);
+            this._getData.addSongToPlayList(newPlayList.id,song)
+          }
+        }
+      }else if(role.substring(0,5)=="addTo"){
+        var id=role.substring(5);
+        console.log(id);
+        
+        this._getData.addSongToPlayList(id,song)
       }
-    });
+    };
   }
   togglePlayer(){
     this._musicController.togglePlayer();
@@ -105,11 +153,11 @@ export class SongsPage implements OnInit {
       component: SongPlayerComponent,
       componentProps: { 
         song:this.activeSong,
-        viewSongOrPlaySong:true 
+        playSong:false 
       }
     });
     await modal.present();
-    await modal.onDidDismiss();
+    await modal.onWillDismiss();
     this.activeSong=this._musicController.getActiveSong();
     this.isPlaying=this._musicController.player?this._musicController.player.playing():false;
   }
@@ -120,28 +168,28 @@ export class SongsPage implements OnInit {
   async order(filter?:string){
     var filter = filter?filter: await this._utils.showOrderMenu();
     if(filter=="title"){
-      this.playList.sort((a,b)=>{
+      this.allSongs.sort((a,b)=>{
         var textA = a.title.toLowerCase();
         var textB = b.title.toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().title;
     }else if(filter=="artist"){
-      this.playList.sort((a,b)=>{
+      this.allSongs.sort((a,b)=>{
         var textA = a.artists[0].toLowerCase();
         var textB = b.artists[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().artist;
     }else if(filter=="genre"){
-      this.playList.sort((a,b)=>{
+      this.allSongs.sort((a,b)=>{
         var textA = a.genres[0].toLowerCase();
         var textB = b.genres[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
-      this.orderedBy=this._language.getActiveLanguage().gender;
+      this.orderedBy=this._language.getActiveLanguage().genre;
     }
-    this._musicController.setPlayList(this.playList);
+    this._musicController.setPlayList(this.allSongs);
   }
   async updateProgress(){
     if(this.isPlaying){
@@ -170,5 +218,73 @@ export class SongsPage implements OnInit {
       "<span style=\"color:"+color+"\">"+this.filterSong+"</span>");
       h2.nativeElement.innerHTML=innerHTML;
     })
+  }
+  async filter(){
+    const allFormats=this._getData.ALLFORMATS;
+    var formatsSelected = await this._utils.filterAlerts("Formatos de audio");
+    //"mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm";
+    var newPlayList:Song[]=[];
+    if(formatsSelected){
+      for (const format of allFormats) {
+        if(formatsSelected.includes(format)){
+          localStorage.setItem(format,"true");
+          newPlayList.push(...this._getData.$allSongs.getValue().filter((s)=>s.path.endsWith(format)))
+        }else{
+          localStorage.setItem(format,"false");
+        }
+      }
+      this.allSongs=newPlayList;
+    }
+  }
+  loadFileSystemFilter(){
+    const allFormats=this._getData.ALLFORMATS;
+    var newPlayList:Song[]=[];
+    for (const format of allFormats) {
+      if(JSON.parse(localStorage.getItem(format))){
+        newPlayList.push(...this._getData.$allSongs.getValue().filter((s)=>s.path.endsWith(format)))
+      };
+    }
+    this.allSongs=newPlayList;
+  }
+  nextPage(slides:IonSlides){
+    slides.slideNext();
+  }
+  async prevPage(slides:IonSlides){
+    await this._utils.sleep(250);
+    slides.slidePrev();
+  }
+  async loadPLCover(){
+    for (const pl of this.plList) {
+      let i =0
+      while(!pl.cover && i<pl.songsPath.length){
+        this.isCoverLoading=true;
+        let metadata = await musicMetadata.fetchFromUrl(pl.songsPath[i])
+        pl.cover  = metadata.common.picture? metadata.common.picture[0]:null;
+        this.isCoverLoading=false;
+        i++;
+      }      
+    }    
+  }
+  async playPlayList(pl:PlayList){    
+    var sleep= this._utils.sleep(250);
+    let newPlayList:Song[]=[];
+    for (const songPath of pl.songsPath) {
+      newPlayList.push(await this._getData.getSong(songPath))
+    }
+    if(!this._musicController.getActiveSong()){
+      await this._musicController.start(newPlayList[0])
+    }
+    this._musicController.setPlayList(newPlayList);
+    await sleep;
+    const modal = await this.modalController.create({
+      component:ViewEditPlaylistComponent,
+      componentProps:{    pl    },
+      cssClass:"modal",
+      mode:"ios",
+      swipeToClose:true,
+      showBackdrop:true
+    });
+  
+    await modal.present();
   }
 }

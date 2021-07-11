@@ -6,7 +6,7 @@
     "changeToSufflePlay":"Modo aleatorio activado",
     "changeToNormalPlay":"Modo normal activado",
     "changeToRepeatOne":"Repitiendo la canción actual",
-    "addToPlayList":"Añadir a la lista de reproducción",
+    "addToPlayList":"Añadir a lista de reproducción",
     "cancel":"Cancelar",
     "playLater":"Reproducir después",
     "aSongMustBePlaying":"Para usar esta función se debe estar reproduciendo una canción",
@@ -26,5 +26,12 @@
     "thisSongWillBePlayedNext":"Esta canción se reproducirá después",
     "title":"Titulo",
     "artist":"Artista",
-    "genre":"Género"
+    "genre":"Género",
+    "delSong":"Borrar canción",
+    "newPlayList":"Nueva lista de reproducción",
+    "nameOfPlayListNotEmpty":"El nombre de la lista de reproducción no puede estar vacío",
+    "songAlreadyExistsInPL":"Esta canción ya está en la lista de reproducción",
+    "songAddedToPL":"Canción añadida a la lista de reproducción",
+    "delete":"Borrar",
+    "play":"Reproducir"
 }

@@ -23,6 +23,14 @@ export class ThemeService {
     }
     return 'danger';
   }
+  getColorStr2():string{
+    var regex = new RegExp('dark-theme');
+
+    if(regex.test(this.document.body.className)){
+      return 'light';
+    }
+    return '';
+  }
   isDarkModeEnable(){
     var regex = new RegExp('dark-theme');
     return regex.test(this.document.body.className);
@@ -47,5 +55,9 @@ export class ThemeService {
       this.enableLight();
       this.statusBar.backgroundColorByHexString('#ff6347');
     }
+  }
+  getBackgroundColor2RGB(){
+    var regex = new RegExp('dark-theme');
+    return regex.test(this.document.body.className) ? [0,139,139] : [255,228,196]
   }
 }

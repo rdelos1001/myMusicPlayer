@@ -19,7 +19,7 @@ import { SongPlayerComponent } from './components/song-player/song-player.compon
 
 @NgModule({
   declarations: [
-    AppComponent, 
+    AppComponent
   ],
   entryComponents: [],
   imports: [

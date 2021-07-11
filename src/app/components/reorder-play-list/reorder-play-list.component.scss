@@ -1,0 +1,18 @@
+.activeSong{
+    color: var(--text-color-selected);
+}
+.nonActiveSong{
+    color:var(--text-color);
+}
+ion-content, ion-list, ion-item{
+    --background:var(--background-color);
+    --ion-background-color:var(--background-color);
+}
+ion-item:focus{
+    color:var(--text-color);
+}
+ion-reorder{
+    ion-icon {
+        color: var(--text-color);
+    }
+}

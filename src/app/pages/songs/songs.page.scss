@@ -3,60 +3,179 @@ ion-content, ion-list, ion-item,ion-toolbar{
     --ion-background-color:var(--background-color);
     color:var(--text-color);
 }
+
+ion-icon{
+    color: var(--button-color);
+}
+ion-slide{
+    display: flex;
+    flex-direction: column;
+    justify-content: normal;
+    
+    div,ion-list{
+        width: 100%;
+    }
+}
+ion-button{
+    --box-shadow:none;
+    --color:var(--text-color);
+}
 .songItem{
     display: flex;
     justify-content: space-between;
     ion-item{
         width: 100%;
         --border-style:0;
+        img{
+            width: 20px;
+        }
     }
 }
-.activeSong{
-    color: var(--text-color-selected);
-}
-.nonActiveSong{
-    color:var(--text-color);
-}
-ion-icon{
-    color: var(--button-color);
-}
-ion-content{
-    position: relative;
-}
-ion-button{
-    --box-shadow:none;
-    --color:var(--text-color);
-}
-.modCol ion-button{
-    font-size: 10px;
-}
-#shearchInput{
-    
-    --highlight-background:var(--decorative-color);
-    
-    --background:var(--searchInput-background);
-    width: 100%;
-}
-#musicControls{
-    position: relative;
-}
-#viewPlayListBtn{
-    position: absolute;
-    right: 0;
-}
-#actionButtons{
-    display: flex;
-    justify-content: space-between;
-}
-#loading{
-    margin: 0 1pc;
-    padding: 0.5pc 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background:var(--background-color);
-
+#page1{
     p{
         color: var(--text-color);
+    }
+    .activeSong{
+        color: var(--text-color-selected);
+    }
+    .nonActiveSong{
+        color:var(--text-color);
+        p{
+            color:var(--text-color-2);
+        }
+    }
+    ion-content{
+        position: relative;
+    }
+
+    .modCol ion-button{
+        font-size: 10px;
+    }
+    #shearchInput{
+        --highlight-background:var(--decorative-color);
+        --background:var(--searchInput-background);
+        width: 100%;
+        height: 50px;
+        position: sticky;
+        top: 0px;
+        z-index: 100;
+    }
+    #viewPlayListBtn{
+        position: absolute;
+        right: 0;
+    }
+    #actionButtons{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    #loading{
+        width: 100%;
+        margin: 0 1pc;
+        padding: 0.5pc 10%;
+        position: sticky;
+        top: 49px;
+        z-index: 100;
+        background:var(--background-color);
+    }
+}
+
+#page2{
+    --animation-duration: 0.25s;
+    ion-button{
+        border: 1px solid var(--text-color);
+        border-radius: 20px;
+    }
+    ion-label{
+        color: var(--text-color);
+    }
+    ion-button:hover{
+        animation-name: clickButton;
+        animation-duration: var(--animation-duration);
+        ion-icon{
+            animation-name: clickIcon;
+            animation-duration: var(--animation-duration);
+        }
+    }
+    #divListPl{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        
+        &>div{
+            &:hover{
+                animation-name: clickPlayList;
+                animation-duration: var(--animation-duration);
+            }
+            width: 100px;
+            margin: 0.5pc;
+            display: flex;
+            flex-direction: column;
+            .imgDiv{
+                ion-spinner{
+                    margin: 0 auto;
+                    width: 100px;
+                    height: 100px;
+                }
+                background-color: black;
+                position: relative;
+                border-radius: 10px;
+                height: 100px;
+                display: flex;
+                ion-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    color: white;
+                    font-size: 30px;
+                }
+            }
+            &>div{
+                text-align: left;
+                ion-label,p{
+                    font-size: 13px;
+                }
+                p{
+                    color: var(--text-color-2);
+                    margin: 0.5pc 0;
+                }
+            }
+        }
+    }
+}
+@keyframes clickButton {
+    from   {
+        background: transparent;
+        color:var(--text-color);
+    }
+    50%  {
+        background: var(--background-color-contrast);
+        color: var(--text-color-contrast);
+    }
+    to {
+        background: transparent;
+        color:var(--text-color);
+    }
+}
+@keyframes clickIcon {
+    from   {
+        color:var(--text-color);
+    }
+    50%  {
+        color: var(--text-color-contrast);
+    }
+    to {
+        color:var(--text-color);
+    }
+}
+@keyframes clickPlayList{
+    from{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(0.9);
+    }
+    to{
+        transform: scale(1);
     }
 }

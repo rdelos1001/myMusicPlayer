@@ -46,6 +46,13 @@ ion-header{
         --background: var(--header-backgroundcolor);
     }
 }
+ion-header > ion-toolbar{
+    ion-button,ion-title,ion-icon{
+        --color: white;
+        color: white;
+    }
+}
+
 ion-footer{
     background: var(--background-color);
     ion-toolbar{

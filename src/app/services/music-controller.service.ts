@@ -11,10 +11,10 @@ import { UtilsService } from './utils.service';
   providedIn: 'root'
 })
 export class MusicControllerService {
+  //Formatos "mp3", "opus", "ogg", "wav", "aac", "m4a", "mp4", "webm"
   public player:Howl= null;
-  private isPlaying:boolean=false;
   $changeSong:EventEmitter<Song>= new EventEmitter<Song>();
-  $allSongs:BehaviorSubject<Song[]>= new BehaviorSubject<Song[]>([]);
+  $playList:BehaviorSubject<Song[]>=new BehaviorSubject<Song[]>([]);
 
   progress=0;
   mod:number=1;
@@ -27,8 +27,8 @@ export class MusicControllerService {
     seconds:""
   };
   toggleProgressVolume: boolean;
-  private activeSong: Song;
-  playList:Song[]=[];
+  private activeSong: Song=null;
+
 
   language:any;
   constructor(private musicControls:MusicControls,
@@ -36,7 +36,7 @@ export class MusicControllerService {
               private _language:LanguageService) {
                 this.language=this._language.getActiveLanguage();
   }
-  start(song:Song):Promise<Song>{
+  start(song:Song):Promise<Song>{    
     return new Promise<Song>((resolve)=>{
       if (this.player){
         this.player.stop();
@@ -45,9 +45,8 @@ export class MusicControllerService {
         src:[song.path],
         html5:true,
         onplay:()=>{
-          this.setActiveSong(song);
           this.totalTime= this.getTime(this.player.duration());
-          this.isPlaying=true;
+          this.setActiveSong(song);
           resolve(song);
         },
         onend:()=>{
@@ -64,32 +63,32 @@ export class MusicControllerService {
     var currentSong:Song;
     switch(this.mod){
       case 1:
-        index=this.playList.indexOf(this.activeSong)+1;
+        index=this.$playList.getValue().indexOf(this.activeSong)+1;
         break;
       case 2:
         do{
-          index= Math.round( Math.random()*(this.playList.length-1) );
-        }while(index==this.playList.indexOf(this.activeSong));
+          index= Math.round( Math.random()*(this.$playList.getValue().length-1) );
+        }while(index==this.$playList.getValue().indexOf(this.activeSong));
         break;
       case 3:
-        index=this.playList.indexOf(this.activeSong);
+        index=this.$playList.getValue().indexOf(this.activeSong);
         break;
     }
-    if(index==this.playList.length){
-     currentSong= await this.start(this.playList[0]);
+    if(index==this.$playList.getValue().length){
+     currentSong= await this.start(this.$playList.getValue()[0]);
     }else{
-      currentSong= await this.start(this.playList[index]);
+      currentSong= await this.start(this.$playList.getValue()[index]);
     }
     this.setActiveSong(currentSong);
     return currentSong;
   }
   async prev():Promise<Song>{
-    let index=this.playList.indexOf(this.activeSong);
+    let index=this.$playList.getValue().indexOf(this.activeSong);
     var currentSong:Song;
     if(index>0){
-      currentSong=await this.start(this.playList[index-1]);
+      currentSong=await this.start(this.$playList.getValue()[index-1]);
     }else{
-      currentSong=await this.start(this.playList[this.playList.length-1]);
+      currentSong=await this.start(this.$playList.getValue()[this.$playList.getValue().length-1]);
     }
     this.setActiveSong(currentSong);
     return currentSong;
@@ -121,12 +120,17 @@ export class MusicControllerService {
     }
   }
   createMusicControls(song:Song){
+    let artist =""
+    for(let SONGartist of song.artists){
+      artist+=SONGartist+","
+    }
+    artist= artist.substring(0,artist.length-1)
+
     this.musicControls.destroy();
     this.musicControls.create({
       track       : song.title,		// optional, default : ''
-      artist      : '',						// optional, default : ''
-      album       : '',     // optional, default: ''
-      cover       : '../../assets/icon/icon.png',		// optional, default : nothing
+      artist      ,						// optional, default : ''
+      cover       : 'icon/icon.png',		// optional, default : nothing
       // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
       //			 or a remote url ('http://...', 'https://...', 'ftp://...')
       isPlaying   : true,			// optional, default : true
@@ -135,14 +139,7 @@ export class MusicControllerService {
       // hide previous/next/close buttons:
       hasPrev   : true,		// show previous button, optional, default: true
       hasNext   : true,		// show next button, optional, default: true
-      hasClose  : false,		// show close button, optional, default: false
-    
-      // Android only, optional
-      // text displayed in the status bar when the notification (and the ticker) are updated
-      ticker	  : '',
-      //All icons default to their built-in android equivalents
-      //The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
-    	
+      hasClose  : true,		// show close button, optional, default: false    	
       playIcon: 'media_play',
 
       pauseIcon: 'media_pause',
@@ -165,23 +162,17 @@ export class MusicControllerService {
           case 'music-controls-pause':
             // Do something
             this.player.pause();
-            this.isPlaying=false;
             this.musicControls.updateIsPlaying(false);
             break;
           case 'music-controls-play':
               this.player.play();
-              this.isPlaying=true;
               this.musicControls.updateIsPlaying(true);
             break;
           case 'music-controls-destroy':
             // Do something
             this.player.stop();
+            navigator['app'].exitApp();
             break;
-          case 'music-controls-toggle-play-pause' :
-            // Do something
-            
-            break;
-
           default:
             break;
         }      
@@ -192,12 +183,11 @@ export class MusicControllerService {
       this.musicControls.updateIsPlaying(true)
   }
   togglePlayer(){
-    if(this.isPlaying){
+    if(this.player.playing()){
       this.player.pause();
     }else{
       this.player.play();
     }
-    this.isPlaying=!this.isPlaying;
   }
   setMod(mod:number):number{
     this.mod=mod;
@@ -215,10 +205,10 @@ export class MusicControllerService {
     return mod;
   }
   playLater(song){
-    var currentSongIndex=this.playList.indexOf(this.activeSong);    
+    var currentSongIndex=this.$playList.getValue().indexOf(this.activeSong);    
     if(currentSongIndex!=-1){
-      var moveSong=this.playList.splice(this.playList.indexOf(song),1)[0];
-      this.playList.splice(this.playList.indexOf(this.activeSong)+1,0,moveSong);
+      var moveSong=this.$playList.getValue().splice(this.$playList.getValue().indexOf(song),1)[0];
+      this.$playList.getValue().splice(this.$playList.getValue().indexOf(this.activeSong)+1,0,moveSong);
       this._utils.presentToast(this.language.thisSongWillBePlayedNext);
     }else{
       this._utils.presentToast(this.language.aSongMustBePlaying);
@@ -231,29 +221,18 @@ export class MusicControllerService {
   getActiveSong():Song{
     return this.activeSong;
   }
-  getAllSongs(){
-    return this.$allSongs.asObservable();
-  }
-  addAllSongs(songs:Song[]|Song){
-    var allsongs=this.$allSongs.getValue();
-    var aux:any=songs;
-    if(JSON.stringify(songs).charAt(0)=='['){
-      allsongs.push(...aux);
-    }else if(JSON.stringify(songs).charAt(0)=='{'){
-      allsongs.push(aux);
-    }    
-    this.$allSongs.next(allsongs);
-  }
   setPlayList(playList:Song[]){
-    this.playList=playList;
+    this.$playList.next(playList);
   }
   addSongToPlayList(songs:Song[]|Song){
-    var allsongs=this.playList;
+    var playlist=this.$playList.getValue();
+
     var aux:any=songs;
     if(JSON.stringify(songs).charAt(0)=='['){
-      allsongs.push(...aux);
+      playlist.push(...aux);
     }else if(JSON.stringify(songs).charAt(0)=='{'){
-      allsongs.push(aux);
-    }    
+      playlist.push(aux);
+    }
+    this.$playList.next(playlist);
   }
 }

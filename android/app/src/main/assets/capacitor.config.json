@@ -17,8 +17,6 @@
         "iconColor": "#00FF00",
         "sound": "smb_jump-super.wav"
       }
-    },
-    "url": "http://192.168.0.5:8100",
-    "cleartext": true
+    }
   }
 }

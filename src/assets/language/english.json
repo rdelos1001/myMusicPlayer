@@ -26,5 +26,12 @@
     "thisSongWillBePlayedNext":"This song will be played next",
     "title":"Title",
     "artist":"Artist",
-    "genre":"Genre"
+    "genre":"Genre",
+    "delSong":"Delete song",
+    "newPlayList":"New play list",
+    "nameOfPlayListNotEmpty":"The name of play list must not be empty",
+    "songAlreadyExistsInPL":"The song is already in the playlist",
+    "songAddedToPL":"Song added to the play list",
+    "delete":"Delete",
+    "play":"Play"
 }

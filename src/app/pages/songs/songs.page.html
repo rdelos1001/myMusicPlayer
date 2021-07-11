@@ -1,41 +1,71 @@
 <app-header [title]="language.songs" settings=true></app-header>
 
-<ion-item id="shearchInput">
-  <ion-icon name="search-outline" slot="start"></ion-icon>
-  <ion-input type="text" [(ngModel)]="filterSong" (ionChange)="highlight()" name="filterSong" [placeholder]="language.search"></ion-input>
-  <ion-icon name="close-circle-outline" slot="end" (click)="filterSong=''"></ion-icon>
-</ion-item>
-
 <ion-content>
-  <div id="actionButtons">
-    <ion-button (click)="order()" fill="clear" mode="ios" shape="round">
-      <ion-icon slot="start" name="filter"></ion-icon>
-      {{language.order}}: {{orderedBy}}
-    </ion-button>
-    <ion-button (click)="filter()" fill="clear" mode="ios" shape="round">
-      <ion-icon slot="start" src="assets/icon/filter.svg"></ion-icon>
-      {{language.filter}}
-    </ion-button>
-  </div>
-  <div id="loading" *ngIf="isLoading">
-    <p>Buscando canciones...</p>
-    <ion-progress-bar [color]="this._theme.getColorStr()" type="indeterminate"></ion-progress-bar>
-  </div>
-  <ion-list *ngIf="playList && playList.length>0">
-    <div class="songItem" *ngFor="let song of playList | filter:filterSong">
-      <ion-item button (click)="clickSong(song)">
-        <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">
-          <h2 #h2>{{song.title}}</h2>
-          <p #p><span *ngFor="let artist of song.artists; index as i"> {{artist}} <span *ngIf="i<song.artists.length-1">,</span><span *ngIf="i>=song.artists.length-1"> - </span></span>
-          <span *ngFor="let genre of song.genres; index as i"  > {{genre}} <span  *ngIf="i<song.genres.length-1">,</span></span></p>      
-        </ion-label>
-        <img *ngIf="song==activeSong && isPlaying" src="/assets/icon/music.gif" width="20px" alt="">
+  <ion-slides #slides >
+    <ion-slide id="page1">
+      <ion-item id="shearchInput">
+        <ion-input type="text" [(ngModel)]="filterSong" (ionChange)="highlight()" name="filterSong" [placeholder]="language.search"></ion-input>
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        <ion-icon name="close-circle-outline" slot="end" (click)="filterSong=''"></ion-icon>
       </ion-item>
-      <ion-button (click)="songSettings(song)">
-        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+      <div id="actionButtons">
+        <ion-button (click)="order()" fill="clear" mode="ios" shape="round">
+          <ion-icon slot="start" name="filter"></ion-icon>
+          {{language.order}}: {{orderedBy}}
+        </ion-button>
+        <ion-button (click)="filter()" fill="clear" mode="ios" shape="round">
+          <ion-icon slot="start" src="assets/icon/filter.svg"></ion-icon>
+          {{language.filter}}
+        </ion-button>
+        <ion-button (click)="nextPage(slides)">
+          <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div id="loading" *ngIf="isLoading">
+        <p>Buscando canciones...</p>
+        <ion-progress-bar [color]="this._theme.getColorStr()" type="indeterminate"></ion-progress-bar>
+      </div>
+      <ion-list *ngIf="allSongs && allSongs.length>0">
+        <div class="songItem" *ngFor="let song of allSongs | filter:filterSong">
+          <ion-item button (click)="clickSong(song)">
+            <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">
+              <h2 #h2>{{song.title}}</h2>
+              <p #p>
+                <span *ngFor="let artist of song.artists; index as i"> {{artist}}<span *ngIf="i<song.artists.length-1">,</span><span *ngIf="i>=song.artists.length-1"> - </span></span>
+                <span *ngFor="let genre of song.genres; index as i"  > {{genre}}<span  *ngIf=" i<song.genres.length-1">,</span></span>
+              </p>      
+            </ion-label>
+            <img *ngIf="song==activeSong && isPlaying" src="/assets/icon/music.gif" alt="gif barras de musica">
+          </ion-item>
+          <ion-button (click)="songSettings(song)">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-list>
+    </ion-slide>
+    <ion-slide id="page2">
+      <ion-button (click)="prevPage(slides)">
+        <ion-icon slot="start" name="musical-note-outline"></ion-icon>
+        {{language.songs}}
       </ion-button>
-    </div>
-  </ion-list>
+      <div id="divListPl">
+        <div *ngFor="let pl of plList" (click)="playPlayList(pl)">
+          <div class="imgDiv">
+            <ion-img *ngIf="!isCoverLoading && !pl.cover" src="/assets/icon/iconTransparent.png" alt=""></ion-img>
+            <ion-spinner *ngIf="isCoverLoading" [color]="this._theme.getColorStr()" name="crescent"></ion-spinner>
+            <ion-img *ngIf="!isCoverLoading && pl.cover" src="data:{{ pl.cover.format }};base64,{{pl.cover.data.toString('base64')}}" 
+            onerror="this.src='/assets/icon/iconTransparent.png';"
+            alt="portada de la canción"></ion-img>
+            <ion-icon name="play-circle"></ion-icon>
+          </div>
+          <div>
+            <ion-label>{{pl.name}}</ion-label>
+            <p>Total de canciones: {{pl.songsPath.length}}</p>
+          </div>
+        </div>
+      </div>
+    </ion-slide>
+  </ion-slides>
 </ion-content>
 <ion-footer *ngIf="activeSong">
   <ion-progress-bar [color]="this._theme.getColorStr()" [value]="progress"></ion-progress-bar>
@@ -52,6 +82,5 @@
         <ion-icon name="play-skip-forward"></ion-icon>
       </ion-button>
     </div>
-
   </ion-toolbar>
 </ion-footer>

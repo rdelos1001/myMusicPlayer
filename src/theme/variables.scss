@@ -78,8 +78,10 @@
   .dark-theme{
     --text-color:white;
     --text-color-contrast:black;
-    --background-color:var(--ion-color-dark);
+    --text-color-2:grey;
+    --background-color:#222428;
     --background-color-contrast:whitesmoke;
+    --background-color-2:darkcyan;
     --text-color-selected:var(--ion-color-success);
     --button-color:white;
     --decorative-color:var(--ion-color-success);
@@ -87,15 +89,17 @@
     --header-backgroundcolor:var(--ion-color-dark);
   }
   .light-theme{
-      --text-color:black;
-      --text-color-contrast:white;
-      --background-color:white;
-      --background-color-contrast:var(--ion-color-dark);
-      --text-color-selected:tomato;
-      --button-color:black;
-      --decorative-color:tomato;
-      --searchInput-background:whitesmoke;
-      --header-backgroundcolor:tomato;
+    --text-color:black;
+    --text-color-contrast:white;
+    --text-color-2:grey;
+    --background-color:white;
+    --background-color-contrast:var(--ion-color-dark);
+    --background-color-2:bisque;
+    --text-color-selected:tomato;
+    --button-color:black;
+    --decorative-color:tomato;
+    --searchInput-background:whitesmoke;
+    --header-backgroundcolor:tomato;
   }
 
 }

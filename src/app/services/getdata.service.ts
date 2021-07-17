@@ -56,20 +56,36 @@ export class GetdataService {
     return this.$allSongs.getValue();  
   }
   async getSong(filepath:string):Promise<Song>{
-    let metadata=await musicMetadata.fetchFromUrl(filepath,{
+    var song:Song;
+    await musicMetadata.fetchFromUrl(filepath,{
       skipCovers:true,
       skipPostHeaders:true
-    });    
-    let artists = metadata.common.artists? metadata.common.artists:["unknown"];
-    let title  = metadata.common.title? metadata.common.title:filepath.substring(filepath.lastIndexOf("/")+1,filepath.length-4);
-    let genres  = metadata.common.genre? metadata.common.genre:["unknown"];
+    })
+    .then((metadata)=>{
+      let artists = ( !metadata.common.artists || (metadata.common.artists.length == 1 && metadata.common.artists[0].trim() == "") )
+                    ? ["unknown"]
+                    : metadata.common.artists.map((art)=>art=art.trim());
+
+      let title  = (metadata.common.title) 
+                   ? metadata.common.title 
+                   : filepath.substring(filepath.lastIndexOf("/")+1,filepath.length-4);
+
+      let genres  = ( !metadata.common.genre || (metadata.common.genre.length == 1 && metadata.common.genre[0].trim() == "") ) 
+                    ? ["unknown"]
+                    : metadata.common.genre.map((gen)=>gen=gen.trim());
+      
+      song = {
+        path:filepath,
+        title,
+        artists,
+        genres
+      }    
+      console.log(song);
+    })
+    .catch((e)=>{
+      console.error(`Error en ${filepath} ${e}`);
+    });
     
-    let song:Song={
-      path:filepath,
-      title,
-      artists,
-      genres
-    }    
     return song
   }
   async requestFilesystemPermission(){
@@ -114,21 +130,17 @@ export class GetdataService {
       let item=localStorage.getItem(localStorage.key(i))
       if(item.charAt(0)=='{'){
         let playList:PlayList= JSON.parse(item);
-        let num:number=Number.parseInt(playList.id.substring(3,4))
+        let num:number=Number.parseInt(playList.id.substring(2))
         if(num>maxNum){
           maxNum=num;
         }
       }
-    }
-    console.log(maxNum);
-    
+    }    
     let newPlayList:PlayList={
       id:'pl'+(maxNum+1),
       name,
       songsPath:[]
-    }
-    console.log(newPlayList);
-    
+    }    
     localStorage.setItem(newPlayList.id,JSON.stringify(newPlayList));
     this.$allPlayList.next(this.getPlayLists())
     return newPlayList;
@@ -165,5 +177,19 @@ export class GetdataService {
   delPl(pl: PlayList) {
     localStorage.removeItem(pl.id);
     this.$allPlayList.next(this.getPlayLists())
+  }
+
+  removeSongFromPL(pl:PlayList,song:Song):boolean{    
+    let i =pl.songsPath.findIndex(spath=>spath==song.path)
+    if(i!=-1 && pl.songsPath.length!=1){
+      pl.songsPath.splice(i,1);
+      localStorage.setItem(pl.id,JSON.stringify(pl))
+      return true;
+    } else if(i==-1) {
+      this._utils.presentAlert("Error",this._language.getActiveLanguage().songDoesntExistInPL);
+    } else {
+      this._utils.presentAlert( this._language.getActiveLanguage().warning , this._language.getActiveLanguage().cantRemoveTheLastSongFromPL)
+    }
+    return false;
   }
 }

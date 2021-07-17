@@ -2,7 +2,7 @@
     "id":"en",
     "songs":"Songs",
     "search":"Search",
-    "loadingSongs":"Importing songs ...",
+    "importingSongs":"Importing songs ...",
     "changeToSufflePlay":"Suffle mode activated",
     "changeToNormalPlay":"Normal mode activated",
     "changeToRepeatOne":"Repeating the current song",
@@ -33,5 +33,14 @@
     "songAlreadyExistsInPL":"The song is already in the playlist",
     "songAddedToPL":"Song added to the play list",
     "delete":"Delete",
-    "play":"Play"
+    "play":"Play",
+    "audioFormat":"Audio format",
+    "SongsImported":"Songs imported",
+    "newPL":"New play list",
+    "nameNewPL":"Play list name",
+    "totalSongs":"Total songs",
+    "warning":"Warning",
+    "songDoesntExistInPL":"The song doesn't be in this play list",
+    "cantRemoveTheLastSongFromPL":"You can't remove the last song from a play list, try removing the play list",
+    "alertMessageRemoveSongFromPl":"Are you sure to remove ${song.title} from the playlist ${pl.name}?"
 }

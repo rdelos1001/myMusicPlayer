@@ -23,12 +23,17 @@ ion-button{
 .songItem{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     ion-item{
         width: 100%;
         --border-style:0;
         img{
             width: 20px;
         }
+
+    }
+    & > ion-label{
+        margin-left: 0.5pc;
     }
 }
 #page1{
@@ -122,12 +127,17 @@ ion-button{
                 border-radius: 10px;
                 height: 100px;
                 display: flex;
+                flex-direction: column;
+                justify-content: center;
                 ion-icon{
                     position: absolute;
                     bottom: 0;
                     right: 0;
                     color: white;
                     font-size: 30px;
+                }
+                img{
+                    height: fit-content;
                 }
             }
             &>div{

@@ -18,15 +18,13 @@ ion-item{
     height: 100px;
     background-color: black;
     border-radius: 15px;
-    ion-img{
+    align-items: center;
+    img{
         width: 100%;
+        height: fit-content;
     }
 }
-ion-col[size="3"]{
-    min-width: 100px;
-    display: flex;
-    justify-content: center;
-}
+
 ion-col[size="6"]{
     display: flex;
     justify-content: center;
@@ -77,4 +75,7 @@ ion-item{
 }
 ion-row > ion-col{
     padding: 0;
+}
+.plInfoRow > div{
+    margin-left: 1pc;
 }

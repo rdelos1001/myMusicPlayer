@@ -2,7 +2,7 @@
     "id":"sp",
     "songs":"Canciones",
     "search":"Buscar",
-    "loadingSongs":"Importando canciones ...",
+    "importingSongs":"Importando canciones ...",
     "changeToSufflePlay":"Modo aleatorio activado",
     "changeToNormalPlay":"Modo normal activado",
     "changeToRepeatOne":"Repitiendo la canción actual",
@@ -33,5 +33,14 @@
     "songAlreadyExistsInPL":"Esta canción ya está en la lista de reproducción",
     "songAddedToPL":"Canción añadida a la lista de reproducción",
     "delete":"Borrar",
-    "play":"Reproducir"
+    "play":"Reproducir",
+    "audioFormat":"Formato de audio",
+    "SongsImported":"Canciones importadas",
+    "newPL":"Nueva lista de reproducción",
+    "nameNewPL":"Nombre de la nueva lista de reproducción",
+    "totalSongs":"Total de canciones",
+    "warning":"Aviso",
+    "songDoesntExistInPL":"La canción no está en esta lista de reprodución",
+    "cantRemoveTheLastSongFromPL":"No puedes eliminar la última canción de la playlist, prueba a eliminar toda la lista de reproducción",
+    "alertMessageRemoveSongFromPl":"¿Estas seguro que desea eliminar a ${song.title} de la lista de reproducción ${pl.name}?"
 }

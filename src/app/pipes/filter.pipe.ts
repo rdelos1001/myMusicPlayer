@@ -12,8 +12,24 @@ export class FilterPipe implements PipeTransform {
       return value
     }
     for (const song of value) {
-      if(song.title.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase())>-1){
+      if(song.title.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
         resultSongs.push(song);
+      }else{
+        if(song.artists){
+          song.artists.forEach((artist)=>{
+            if(artist.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
+              resultSongs.push(song);
+            }
+          })
+        }
+
+        if(song.genres){
+          song.genres.forEach((genres)=>{
+            if(genres.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
+              resultSongs.push(song);
+            }
+          })
+        }
       };
     };
     return resultSongs;

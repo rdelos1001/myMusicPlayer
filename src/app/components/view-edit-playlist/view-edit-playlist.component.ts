@@ -30,9 +30,7 @@ export class ViewEditPlaylistComponent implements OnInit {
   }
   
   async ngOnInit() {
-    for (const sPath of this.pl.songsPath) {
-      this.songs.push(await this._getData.getSong(sPath))
-    }
+    this.updateSongList();
   }
 
   dismiss(){
@@ -54,9 +52,7 @@ export class ViewEditPlaylistComponent implements OnInit {
   
   async playPlayList(){
     let newPlayList:Song[]=[];
-    for (const songPath of this.pl.songsPath) {
-      console.log("song "+songPath);
-      
+    for (const songPath of this.pl.songsPath) {      
       newPlayList.push(await this._getData.getSong(songPath))
     }
     await this._musicController.start(newPlayList[0])
@@ -68,6 +64,25 @@ export class ViewEditPlaylistComponent implements OnInit {
     if(confirm){
       this._getData.delPl(this.pl);
       this.modalController.dismiss();
+    }
+  }
+  
+  async removeSongFromPL(song:Song){
+    let alertMessage:string = this._language.getActiveLanguage().alertMessageRemoveSongFromPl;
+
+    alertMessage = alertMessage.replace('${song.title}',`<b>${song.title}</b>`);
+    alertMessage = alertMessage.replace('${pl.name}',`<b>${this.pl.name}</b>`);
+    
+    let result = await this._utils.presentAlertConfirm('Aviso',alertMessage );
+    if(result && this._getData.removeSongFromPL(this.pl,song)){
+      this.updateSongList();
+    }
+  }
+
+  async updateSongList(){
+    this.songs = [];
+    for (const sPath of this.pl.songsPath) {
+      this.songs.push(await this._getData.getSong(sPath))
     }
   }
 }

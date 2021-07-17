@@ -146,13 +146,16 @@ export class UtilsService {
     //"mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"
     var alertInputs:any[]=[]
     const allFormats=["mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"];
+    var formatsAvaible:string[]= JSON.parse(localStorage.getItem('filters'))
+    
     for (const format of allFormats) {
+      let checked:boolean= formatsAvaible.includes(format);
       alertInputs.push({
         name: format,
         type: 'checkbox',
         label: format.toUpperCase(),
         value: format,
-        checked:JSON.parse(localStorage.getItem(format))
+        checked
       })
     }
     const alert = await this.alertController.create({
@@ -160,7 +163,7 @@ export class UtilsService {
       inputs: alertInputs,
       buttons: [
         {
-          text: 'Cancel',
+          text: this._language.getActiveLanguage().cancel,
           role: 'cancel'
         }, {
           text: 'Ok',
@@ -209,12 +212,12 @@ export class UtilsService {
   async newPlayListAlert():Promise<string>{
     const cancelLbl= this._language.getActiveLanguage().cancel
     const alert = await this.alertController.create({
-      header: 'Nueva playList',
+      header: this._language.getActiveLanguage().newPL,
       inputs:[
         {
           name: 'name',
           type: 'text',
-          placeholder: 'Nombre de la nueva lista de reproducción'
+          placeholder: this._language.getActiveLanguage().nameNewPL
         },
       ],
       buttons: [

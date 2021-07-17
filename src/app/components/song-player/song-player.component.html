@@ -8,8 +8,8 @@
 </ion-header>
 <ion-content class="ion-no-border">
   <div id="artistGenreLbl">
-    <p *ngIf="song.artists">{{language.artist}}: <span *ngFor="let artist of song.artists; index as i"> {{artist}} <span *ngIf="i<song.artists.length-1">,</span></span></p>
-    <p *ngIf="song.genres" >{{language.genre}}: <span  *ngFor="let genre of song.genres; index as i"  > {{genre}} <span  *ngIf="i<song.genres.length-1">,</span></span></p>
+    <p *ngIf="song.artists[0] != 'unknown' ">{{language.artist}}: <span *ngFor="let artist of song.artists; index as i"> {{artist}}<span *ngIf="i<song.artists.length-1">,</span></span></p>
+    <p *ngIf="song.genres[0] != 'unknown' " >{{language.genre}}: <span  *ngFor="let genre of song.genres; index as i"> {{genre}}<span  *ngIf="i<song.genres.length-1">,</span></span></p>
   </div>
     
   <div id="imgDiv">

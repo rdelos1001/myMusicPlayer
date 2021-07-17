@@ -33,6 +33,7 @@ export class SongPlayerComponent implements OnInit {
     minutes:0,
     seconds:""
   };
+
   constructor(private modalController: ModalController,
               private _musicController:MusicControllerService,
               private _language:LanguageService,
@@ -48,7 +49,7 @@ export class SongPlayerComponent implements OnInit {
     this.isPlaying=this._musicController.player.playing();    
     this.songCoverLoading=true;
     musicMetadata.fetchFromUrl(this.song.path).then((metadata)=>{
-      this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;
+      this.song.cover  = metadata.common.picture? metadata.common.picture[0]:null;      
       this.songCoverLoading=false;
     })
     this.totalTime=this._musicController.totalTime;

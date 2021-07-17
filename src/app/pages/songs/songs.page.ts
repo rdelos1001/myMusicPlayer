@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { Plugins } from '@capacitor/core';
-import { IonRange, IonSlides, ModalController } from '@ionic/angular';
+import { IonRange, IonSlides, ModalController, Platform } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
@@ -10,9 +9,7 @@ import { MusicControllerService } from 'src/app/services/music-controller.servic
 import { GetdataService } from 'src/app/services/getdata.service';
 import { PlayList } from 'src/app/interfaces/PlayList';
 import * as musicMetadata from 'music-metadata-browser';
-import { ReorderPlayListComponent } from 'src/app/components/reorder-play-list/reorder-play-list.component';
 import { ViewEditPlaylistComponent } from 'src/app/components/view-edit-playlist/view-edit-playlist.component';
-const { Filesystem } = Plugins;
 
 @Component({
   selector: 'app-songs',
@@ -20,6 +17,7 @@ const { Filesystem } = Plugins;
   styleUrls: ['./songs.page.scss'],
 })
 export class SongsPage implements OnInit {
+
   filterSong='';
   orderedBy="";
   allSongs:Song[]=[];
@@ -30,9 +28,11 @@ export class SongsPage implements OnInit {
   progress:number=0;
   plList:PlayList[]=[];
   isCoverLoading:boolean=false;
+  editPlayListModalActive:boolean=false;
   @ViewChild('volumeRange',{static:false}) volumeRange:ElementRef;
   @ViewChild('progressRange',{static:false}) progressRange:IonRange;
   @ViewChildren('h2')h2lbls:QueryList<ElementRef>;
+  @ViewChildren('p')pLbls:QueryList<ElementRef>;
 
   constructor(private _utils:UtilsService,
               private _language:LanguageService,
@@ -63,8 +63,10 @@ export class SongsPage implements OnInit {
     });
     this._getData.getPlayListsObs().subscribe((allPlaylist)=>{
       this.plList=allPlaylist;
+      this.loadPLCover();
     })
     this.isLoading=true;
+    
     const localFiles=[
       "assets/mp3/ACDC - Highway to Hell.mp3",
       "assets/mp3/oggExample.ogg",
@@ -78,12 +80,11 @@ export class SongsPage implements OnInit {
       "assets/mp3/Evanescence - Bring Me To Life.mp3"
     ]
     for (const f of localFiles) {
-      const song=await this._getData.getSong(f);
+      const song=await this._getData.getSong(f);      
       this._getData.addAllSongs(song);
     }
-    
-    this.loadPLCover();
-    var files =(await Filesystem.readdir({path:"/storage"})).files;
+
+/*     var files =(await Filesystem.readdir({path:"/storage"})).files;
     const SDCARD_DIR="/storage/"+files.find((el)=>el!="self"&&el!="emulated");
     this._getData.SDCARD_DIR=SDCARD_DIR;
     
@@ -97,11 +98,13 @@ export class SongsPage implements OnInit {
     for (const dir of dirs) {
       await this._getData.findSongs(dir);
     };
-    
+     */
+
+    this.loadPLCover();
     this.allSongs=this._getData.$allSongs.getValue();
     this.loadFileSystemFilter();
     this.order("title");
-    this._utils.presentToast("Canciones encontradas");
+    this._utils.presentToast( this._language.getActiveLanguage().SongsImported );
     this.isLoading=false;
   }
   async clickSong(song:Song){
@@ -137,9 +140,7 @@ export class SongsPage implements OnInit {
           }
         }
       }else if(role.substring(0,5)=="addTo"){
-        var id=role.substring(5);
-        console.log(id);
-        
+        var id=role.substring(5);        
         this._getData.addSongToPlayList(id,song)
       }
     };
@@ -200,9 +201,7 @@ export class SongsPage implements OnInit {
     setTimeout(()=>this.updateProgress(),1000)
   }
   async highlight(){
-    await new Promise((resolve)=>{
-      setTimeout(()=>resolve(""),250)
-    })
+    await this._utils.sleep(250);
 
     var color:string="";
     if(this._theme.isDarkModeEnable()){
@@ -214,37 +213,52 @@ export class SongsPage implements OnInit {
       var innerHTML:string=h2.nativeElement.innerHTML;
       innerHTML=innerHTML.replace(new RegExp("<span style=\"color:"+color+"\">","g"),"");
       innerHTML=innerHTML.replace(new RegExp("</span>","g"),"");
-      innerHTML=innerHTML.replace(new RegExp(this.filterSong,"g"),
-      "<span style=\"color:"+color+"\">"+this.filterSong+"</span>");
+      const originalText=innerHTML;
+      
+      let match=originalText.match(new RegExp(this.filterSong,"i"));
+      var textToHighlight = match ? match[0] : "" 
+      
+      innerHTML=innerHTML.replace(
+        new RegExp(textToHighlight,"g"),
+        "<span style=\"color:"+color+"\">"+ textToHighlight +"</span>"
+      );
       h2.nativeElement.innerHTML=innerHTML;
     })
+    this.pLbls.forEach((p)=>{
+      var innerText:string=p.nativeElement.innerText;
+      innerText=innerText.replace(new RegExp("<span style=\"color:"+color+"\">","g"),"");
+      innerText=innerText.replace(new RegExp("</span>","g"),"");
+      const originalText=innerText;
+      
+      let match=originalText.match(new RegExp(this.filterSong,"i"));
+      var textToHighlight = match ? match[0] : "" 
+      
+      innerText=innerText.replace(
+        new RegExp(textToHighlight,"g"),
+        "<span style=\"color:"+color+"\">"+ textToHighlight +"</span>"
+      );
+      p.nativeElement.innerHTML=innerText;
+    })    
   }
-  async filter(){
+  async filter(formatsSelected?:string[]){
     const allFormats=this._getData.ALLFORMATS;
-    var formatsSelected = await this._utils.filterAlerts("Formatos de audio");
+    if(!formatsSelected)
+    formatsSelected = await this._utils.filterAlerts( this._language.getActiveLanguage().audioFormat );
     //"mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm";
     var newPlayList:Song[]=[];
     if(formatsSelected){
       for (const format of allFormats) {
         if(formatsSelected.includes(format)){
-          localStorage.setItem(format,"true");
           newPlayList.push(...this._getData.$allSongs.getValue().filter((s)=>s.path.endsWith(format)))
-        }else{
-          localStorage.setItem(format,"false");
         }
       }
+      localStorage.setItem('filters',JSON.stringify(formatsSelected))
       this.allSongs=newPlayList;
     }
   }
   loadFileSystemFilter(){
-    const allFormats=this._getData.ALLFORMATS;
-    var newPlayList:Song[]=[];
-    for (const format of allFormats) {
-      if(JSON.parse(localStorage.getItem(format))){
-        newPlayList.push(...this._getData.$allSongs.getValue().filter((s)=>s.path.endsWith(format)))
-      };
-    }
-    this.allSongs=newPlayList;
+    let filtersAvaible:string[]= JSON.parse(localStorage.getItem('filters'));
+    this.filter(filtersAvaible);    
   }
   nextPage(slides:IonSlides){
     slides.slideNext();
@@ -254,18 +268,20 @@ export class SongsPage implements OnInit {
     slides.slidePrev();
   }
   async loadPLCover(){
+    this.isCoverLoading=true;
     for (const pl of this.plList) {
-      let i =0
-      while(!pl.cover && i<pl.songsPath.length){
-        this.isCoverLoading=true;
+      let i =0;
+      while(!pl.cover && i<pl.songsPath.length){      
         let metadata = await musicMetadata.fetchFromUrl(pl.songsPath[i])
         pl.cover  = metadata.common.picture? metadata.common.picture[0]:null;
-        this.isCoverLoading=false;
+        
         i++;
-      }      
+      }
+      this.isCoverLoading=false;
     }    
   }
-  async playPlayList(pl:PlayList){    
+  async playPlayList(pl:PlayList){
+    this.editPlayListModalActive = true;
     var sleep= this._utils.sleep(250);
     let newPlayList:Song[]=[];
     for (const songPath of pl.songsPath) {
@@ -286,5 +302,7 @@ export class SongsPage implements OnInit {
     });
   
     await modal.present();
+    await modal.onDidDismiss();
+    this.editPlayListModalActive = false;
   }
 }

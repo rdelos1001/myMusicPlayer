@@ -79,8 +79,7 @@ export class GetdataService {
         title,
         artists,
         genres
-      }    
-      console.log(song);
+      }
     })
     .catch((e)=>{
       console.error(`Error en ${filepath} ${e}`);

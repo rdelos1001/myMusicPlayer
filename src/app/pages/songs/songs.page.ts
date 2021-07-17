@@ -207,21 +207,25 @@ export class SongsPage implements OnInit {
     if(this._theme.isDarkModeEnable()){
       color="tomato";
     }else{
-      color="blue"
+      color="blue";
     }
     this.h2lbls.forEach((h2)=>{
       var innerHTML:string=h2.nativeElement.innerHTML;
-      innerHTML=innerHTML.replace(new RegExp("<span style=\"color:"+color+"\">","g"),"");
+
+      innerHTML=innerHTML.replace(new RegExp(/<span style="color:(tomato|blue)">/g),"");
       innerHTML=innerHTML.replace(new RegExp("</span>","g"),"");
-      const originalText=innerHTML;
+      if(this.filterSong.trim() != ""){
+        const originalText=innerHTML;
       
-      let match=originalText.match(new RegExp(this.filterSong,"i"));
-      var textToHighlight = match ? match[0] : "" 
-      
-      innerHTML=innerHTML.replace(
-        new RegExp(textToHighlight,"g"),
-        "<span style=\"color:"+color+"\">"+ textToHighlight +"</span>"
-      );
+        let match=originalText.match(new RegExp(this.filterSong,"i"));
+        var textToHighlight = match ? match[0] : "";
+        
+        innerHTML=innerHTML.replace(
+          new RegExp(textToHighlight,"g"),
+          "<span style=\"color:"+color+"\">"+ textToHighlight +"</span>"
+          );
+      }
+        
       h2.nativeElement.innerHTML=innerHTML;
     })
     this.pLbls.forEach((p)=>{

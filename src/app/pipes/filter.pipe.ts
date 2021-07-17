@@ -6,33 +6,35 @@ import { Song } from '../interfaces/song';
 })
 export class FilterPipe implements PipeTransform {
 
-  transform(value:Song[], arg: string):any {
-    var resultSongs=[];
+  transform(value:Song[], arg: string):Song[] {
+    var resultSongs:Set<Song>= new Set<Song>();
     if(!arg){
-      return value
+      return value;
     }
+    
     for (const song of value) {
       if(song.title.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-        resultSongs.push(song);
+        resultSongs.add(song);
       }else{
         if(song.artists){
           song.artists.forEach((artist)=>{
             if(artist.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-              resultSongs.push(song);
+              resultSongs.add(song);
             }
           })
         }
-
+        
         if(song.genres){
           song.genres.forEach((genres)=>{
             if(genres.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-              resultSongs.push(song);
+              resultSongs.add(song);
             }
           })
         }
       };
     };
-    return resultSongs;
+    console.log(resultSongs);
+    return Array.from(resultSongs);
   };
 
 }

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { IonRange, IonSlides, ModalController, Platform } from '@ionic/angular';
+import { IonRange, IonSlides, ModalController } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
@@ -10,6 +10,11 @@ import { GetdataService } from 'src/app/services/getdata.service';
 import { PlayList } from 'src/app/interfaces/PlayList';
 import * as musicMetadata from 'music-metadata-browser';
 import { ViewEditPlaylistComponent } from 'src/app/components/view-edit-playlist/view-edit-playlist.component';
+import { Plugins } from '@capacitor/core';
+import { SongDetailsComponent } from 'src/app/components/song-details/song-details.component';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+
+const { Filesystem } = Plugins;
 
 @Component({
   selector: 'app-songs',
@@ -39,7 +44,8 @@ export class SongsPage implements OnInit {
               private _theme:ThemeService,
               private _musicController:MusicControllerService,
               private modalController: ModalController,
-              private _getData:GetdataService) {
+              private _getData:GetdataService,
+              private statusBar:StatusBar) {
                 this.language=this._language.getActiveLanguage();
               }
   ionViewWillEnter(){    
@@ -47,11 +53,11 @@ export class SongsPage implements OnInit {
   }
   async ngOnInit() {
 
-    await this._getData.requestFilesystemPermission()
+    await this._getData.requestFilesystemPermission();
     this._musicController.$changeSong.subscribe(song=>{
       this.activeSong=song;
       this.isPlaying=this._musicController.player.playing();
-      this.updateProgress();
+
     });
     this._getData.getAllSongs().subscribe((allsongs)=>{
       for (const song of allsongs) {
@@ -95,7 +101,7 @@ export class SongsPage implements OnInit {
       SDCARD_DIR+"/Download"
     ];
     
-    for (const dir of dirs) {
+    for (const dir of dirs) {      
       await this._getData.findSongs(dir);
     };
      */
@@ -120,34 +126,47 @@ export class SongsPage implements OnInit {
     await modal.onWillDismiss();
     this.activeSong=this._musicController.getActiveSong();
     this.isPlaying=this._musicController.player?this._musicController.player.playing():false;
+    this.updateProgress();
   }
-  async songSettings(song:Song){
+  async songSettings(song:Song){    
     let role = await this._utils.songSettingMenu(song);
     if(role==="playLater"){
       this._musicController.playLater(song);
     }else if(role==="delSong"){
-      this._getData.delSong(song);
+      if(this._musicController.getActiveSong() && this._musicController.getActiveSong().path == song.path){
+        this.togglePlayer();
+      }
+      this._getData.delSong(song).then(()=>{
+        this.allSongs.splice( this.allSongs.indexOf(song) );
+      });
     }else if(role==="addToPlayList"){
       let role=await this._utils.showAddToPlayListMenu(this._getData.getPlayLists());
       if(role=="newPlayList"){
         let name =await this._utils.newPlayListAlert();
         if(name){
-          if(name.length==0){
-            this._utils.presentAlert("Error",this._language.getActiveLanguage().nameOfPlayListNotEmpty)
-          }else{
-            let newPlayList=this._getData.newPlayList(name);
-            this._getData.addSongToPlayList(newPlayList.id,song)
-          }
+          let newPlayList=this._getData.newPlayList(name);
+          this._getData.addSongToPlayList(newPlayList.id,song)
+        }else{
+          this._utils.presentAlert("Error",this._language.getActiveLanguage().nameOfPlayListNotEmpty)
         }
       }else if(role.substring(0,5)=="addTo"){
         var id=role.substring(5);        
         this._getData.addSongToPlayList(id,song)
       }
+    }else if(role==="details"){
+      const modal = await this.modalController.create({
+        component:SongDetailsComponent,
+        componentProps:{ song }
+      })
+      await modal.present();
     };
   }
   togglePlayer(){
     this._musicController.togglePlayer();
     this.isPlaying=this._musicController.player.playing();
+    if(this.isPlaying){
+      this.updateProgress();
+    }
   }
   async clickFooter(){
     const modal = await this.modalController.create({
@@ -192,23 +211,19 @@ export class SongsPage implements OnInit {
     }
     this._musicController.setPlayList(this.allSongs);
   }
-  async updateProgress(){
+  async updateProgress(){    
     if(this.isPlaying){
       let aux= this._musicController.player.seek().toString();
       let seek:number = Number.parseInt(aux);
       this.progress=(seek/this._musicController.player.duration())||0;
+      setTimeout(()=>this.updateProgress(),1000)
     }
-    setTimeout(()=>this.updateProgress(),1000)
   }
   async highlight(){
     await this._utils.sleep(250);
 
-    var color:string="";
-    if(this._theme.isDarkModeEnable()){
-      color="tomato";
-    }else{
-      color="blue";
-    }
+    var color:string=this._theme.getHighlightColor();
+    
     this.h2lbls.forEach((h2)=>{
       var innerHTML:string=h2.nativeElement.innerHTML;
 
@@ -230,7 +245,7 @@ export class SongsPage implements OnInit {
     })
     this.pLbls.forEach((p)=>{
       var innerText:string=p.nativeElement.innerText;
-      innerText=innerText.replace(new RegExp("<span style=\"color:"+color+"\">","g"),"");
+      innerText=innerText.replace(new RegExp(/<span style="color:(tomato|blue)">/g),"");
       innerText=innerText.replace(new RegExp("</span>","g"),"");
       const originalText=innerText;
       
@@ -307,6 +322,12 @@ export class SongsPage implements OnInit {
   
     await modal.present();
     await modal.onDidDismiss();
+    this.updateProgress();
+    if(this._theme.isDarkModeEnable()){
+      this.statusBar.backgroundColorByHexString('#222428');
+    }else{
+      this.statusBar.backgroundColorByHexString('#ff6347');
+    }
     this.editPlayListModalActive = false;
   }
 }

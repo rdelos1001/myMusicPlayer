@@ -46,28 +46,35 @@ export class UtilsService {
   }
   async songSettingMenu(song:Song) {
     var delSongLbl=this._language.getActiveLanguage().delSong;
-    var cancelLabel=this._language.getActiveLanguage().cancel;
-    var playLaterLabel=this._language.getActiveLanguage().playLater;
-    var addToPlayList=this._language.getActiveLanguage().addToPlayList;
+    var cancelLbl=this._language.getActiveLanguage().cancel;
+    var playLaterLbl=this._language.getActiveLanguage().playLater;
+    var addToPlayListLbl=this._language.getActiveLanguage().addToPlayList;
+    var detailsLbl=this._language.getActiveLanguage().details;
 
     const actionSheet = await this.actionSheetController.create({
       header: song.title,
       buttons: [
         {
-          text:addToPlayList,
+          text:addToPlayListLbl,
           icon:"add-circle",
           role:"addToPlayList"
         },
         {
-          text: playLaterLabel,
+          text: playLaterLbl,
           icon: 'share',
           role: 'playLater'
         },{
           text: delSongLbl,
           icon: 'trash',
           role: 'delSong'
-        }, {
-          text: cancelLabel,
+        },
+        {
+          text:detailsLbl,
+          icon: 'reader-outline',
+          role: 'details'
+        },
+        {
+          text: cancelLbl,
           icon: 'close',
           role: 'cancel'
         }
@@ -147,6 +154,8 @@ export class UtilsService {
     var alertInputs:any[]=[]
     const allFormats=["mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"];
     var formatsAvaible:string[]= JSON.parse(localStorage.getItem('filters'))
+    console.log(JSON.stringify(formatsAvaible));
+    console.log(`myLog ${JSON.stringify(formatsAvaible)}`);
     
     for (const format of allFormats) {
       let checked:boolean= formatsAvaible.includes(format);
@@ -217,7 +226,7 @@ export class UtilsService {
         {
           name: 'name',
           type: 'text',
-          placeholder: this._language.getActiveLanguage().nameNewPL
+          placeholder: this._language.getActiveLanguage().name
         },
       ],
       buttons: [

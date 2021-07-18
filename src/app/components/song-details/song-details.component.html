@@ -1,0 +1,53 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-button (click)="dismiss()" fill="clear" slot="start">
+      <ion-icon name="caret-back-outline"></ion-icon>
+    </ion-button>
+    <ion-title>Song details</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>{{language.title}}</ion-label>
+      <ion-input type="text" readonly>{{song.title}}</ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>{{language.path}}</ion-label>
+      <ion-input type="text" readonly>{{song.path.substring( song.path.indexOf('/storage') )}}</ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>{{language.format}}</ion-label>
+      <ion-input type="text" readonly>{{song.path.substring( song.path.lastIndexOf('.'))}}</ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>{{language.artists}}</ion-label>
+      <ion-input type="text" readonly>{{song.artists}}</ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>{{language.genres}}</ion-label>
+      <ion-input type="text" readonly>{{song.genres}}</ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{language.cover}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+
+      <ion-spinner *ngIf="loadingCover" [color]="this._theme.getColorStr()" name="crescent" class="spinner-large"></ion-spinner>
+      <ion-slides *ngIf="!loadingCover && songCovers.length>0" pager="true">
+        <ion-slide *ngFor="let cover of songCovers">
+          <img 
+          src="data:{{ cover.format }};base64,{{cover.data.toString('base64')}}" 
+          onerror="this.src='/assets/icon/iconTransparent.png';"
+          width="100%"
+          alt="portada de la canción">
+        </ion-slide>
+      </ion-slides>
+      <img *ngIf="!loadingCover && songCovers.length<=0" src="/assets/icon/iconTransparent.png" alt="">
+
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>

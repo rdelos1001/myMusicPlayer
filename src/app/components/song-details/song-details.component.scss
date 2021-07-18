@@ -1,0 +1,34 @@
+ion-item{
+    ion-label{
+        margin-right: 1pc;
+    }
+}
+ion-content{
+    --background: var(--background-color);
+    ion-list{
+        --ion-background-color:var(--background-color);
+    }
+    ion-label,ion-input{
+        --color:var(--text-color);
+    }
+    ion-card{
+        --background: transparent ;
+        ion-card-header > ion-card-title{
+            --color:var(--text-color);
+        }
+        ion-card-content{
+            text-align: center;
+            ion-slides{
+                --bullet-background-active: var(--decorative-color);
+                --bullet-background:var(--text-color-2);
+                ion-slide{
+                    width: 100%;
+                }
+            }
+            .spinner-large {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    }
+}

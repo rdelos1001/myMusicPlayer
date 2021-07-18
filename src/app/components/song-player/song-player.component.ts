@@ -89,9 +89,11 @@ export class SongPlayerComponent implements OnInit {
     let seek:number = Number.parseInt(aux);
     this.currentTime= this._musicController.getTime(seek);
     this.progress=(seek/this._musicController.player.duration())*100||0;
-    setTimeout(()=>{
-      this.updateProgress();
-    },1000);
+    if(this.isPlaying){
+      setTimeout(()=>{
+        this.updateProgress();
+      },1000);
+    }
   }
   changeVolume(volume?:number){
     let newVolume=volume==undefined?this.volume:volume;

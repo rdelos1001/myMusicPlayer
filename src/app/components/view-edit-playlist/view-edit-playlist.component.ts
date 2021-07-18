@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { IonRow, ModalController } from '@ionic/angular';
 import { PlayList } from 'src/app/interfaces/playList';
 import { Song } from 'src/app/interfaces/song';
@@ -25,12 +26,18 @@ export class ViewEditPlaylistComponent implements OnInit {
               private _getData:GetdataService,
               private _theme:ThemeService,
               private _musicController:MusicControllerService,
-              private _utils:UtilsService) {
+              private _utils:UtilsService,
+              private statusBar:StatusBar) {
     this.language=this._language.getActiveLanguage();
   }
   
   async ngOnInit() {
     this.updateSongList();
+    if(this._theme.isDarkModeEnable()){
+      this.statusBar.backgroundColorByHexString('008B8B')
+    }else{
+      this.statusBar.backgroundColorByHexString('ffe4c4')
+    }
   }
 
   dismiss(){

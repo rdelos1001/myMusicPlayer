@@ -6,13 +6,15 @@ import { ReorderPlayListComponent } from './reorder-play-list/reorder-play-list.
 import { IonicModule } from '@ionic/angular';
 import { SongPlayerComponent } from './song-player/song-player.component';
 import { ViewEditPlaylistComponent } from './view-edit-playlist/view-edit-playlist.component';
+import { SongDetailsComponent } from './song-details/song-details.component';
 
 @NgModule({
   declarations: [
     HeaderComponent,
     ReorderPlayListComponent,
     SongPlayerComponent,
-    ViewEditPlaylistComponent
+    ViewEditPlaylistComponent,
+    SongDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -23,7 +25,8 @@ import { ViewEditPlaylistComponent } from './view-edit-playlist/view-edit-playli
     HeaderComponent,
     ReorderPlayListComponent,
     SongPlayerComponent,
-    ViewEditPlaylistComponent
+    ViewEditPlaylistComponent,
+    SongDetailsComponent
   ]
 })
 export class ComponentsModule { }

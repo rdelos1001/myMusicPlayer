@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Plugins } from '@capacitor/core';
 import { Song } from '../interfaces/song';
 import * as musicMetadata from 'music-metadata-browser';
-import { MusicControllerService } from './music-controller.service';
 import { UtilsService } from './utils.service';
 import { BehaviorSubject } from 'rxjs';
 import { PlayList } from '../interfaces/playList';
@@ -28,21 +27,22 @@ export class GetdataService {
                     this.formatsSelected.push(format);
                   }
                 }
+                if(this.formatsSelected.length == 0){
+                  this.formatsSelected.push("mp4");
+                  this.formatsSelected.push("mp3");
+                }
                 this.$allPlayList.next(this.getPlayLists())
               }
   
   async findSongs(path:string):Promise<Song[]>{
     await Filesystem.readdir({path}).then(async (dir)=>{
       // /\.[mp3]|[mp4]|[opus]|[ogg]|[wav]|[aac]|[m4a]|[webm]$/
-      var formatsPatternStr="\.";
-      this.formatsSelected.forEach((format)=>{
-        formatsPatternStr+=`[${format}]|`
-      })
-      formatsPatternStr=formatsPatternStr.slice(0,-1)
-      formatsPatternStr+="$";
-      const formatsPattern= new RegExp(formatsPatternStr);
       
-      var files =dir.files.filter((el)=>formatsPattern.test(el));
+      var files =dir.files.filter((el)=>{
+        for (const format of this.ALLFORMATS) {
+          return el.endsWith(format);
+        }
+      });
 
       for (const el of files) {
         var win:any=window;
@@ -93,12 +93,22 @@ export class GetdataService {
       resolve(true)
     })
   }
-  async delSong(song:Song){
-    var accepted=await this._utils.presentAlertConfirm("Aviso","¿Estas seguro de eliminar la canción "+song.title+"?");
+  async delSong(song:Song){  
+    let messageAlert:string = this._language.getActiveLanguage().alertMessageDeleteSong;
+    messageAlert = messageAlert.replace('${song.title}',song.title);
+    var accepted=await this._utils.presentAlertConfirm(this._language.getActiveLanguage().warning,messageAlert);
+    let path = song.path.substring( song.path.indexOf('/storage') )
     if(accepted){
-      Filesystem.deleteFile({path:song.path}).then(()=>{
-        this.removeToAllSongs(song);        
-        this._utils.presentAlert("Éxito","La canción se ha eliminado correctamente");
+      Filesystem.deleteFile({path}).then(()=>{
+        this.removeToAllSongs(song);
+        let successMessage:string = this._language.getActiveLanguage().songDeletedSuccessfully; 
+        successMessage = successMessage.replace('${song.title}',song.title);
+        this._utils.presentAlert(this._language.getActiveLanguage().success,successMessage);
+      }).catch(()=>{
+        let errorMessage:string = this._language.getActiveLanguage().errorDeletingSong;
+        errorMessage=errorMessage.replace('${song.title}',song.title);
+        console.error(`Error eliminando la canción ${JSON.stringify(song)}`);
+        this._utils.presentAlert('Error',errorMessage);
       })
     }
   }

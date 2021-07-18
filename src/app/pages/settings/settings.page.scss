@@ -6,6 +6,6 @@ ion-content, ion-list, ion-item,ion-toolbar{
     --ion-background-color:var(--background-color);
     color:var(--text-color);
 }
-ion-item:focus{
-    color:var(--text-color);
+ion-item{
+    --color-hover:var(--text-color);
 }

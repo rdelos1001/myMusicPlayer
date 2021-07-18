@@ -33,7 +33,6 @@ export class FilterPipe implements PipeTransform {
         }
       };
     };
-    console.log(resultSongs);
     return Array.from(resultSongs);
   };
 

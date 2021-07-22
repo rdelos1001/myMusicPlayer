@@ -52,5 +52,6 @@
     "cantRemoveTheLastSongFromPL": "No puedes eliminar la última canción de la playlist, prueba a eliminar toda la lista de reproducción",
     "songDeletedSuccessfully": "Canción ${song.title} eliminada",
     "errorDeletingSong": "Error eliminando ${song.title}",
-    "details": "Detalles"
+    "details": "Detalles",
+    "songDetails":"Detalles de canción"
 }

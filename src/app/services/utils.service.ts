@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionSheetController, AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 import { PlayList } from '../interfaces/playList';
 import { Song } from '../interfaces/song';
 import { LanguageService } from './language.service';
@@ -152,10 +153,8 @@ export class UtilsService {
   async filterAlerts(header:string):Promise<string[]> {
     //"mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"
     var alertInputs:any[]=[]
-    const allFormats=["mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"];
+    const allFormats=environment.ALL_FORMATS;
     var formatsAvaible:string[]= JSON.parse(localStorage.getItem('filters'))
-    console.log(JSON.stringify(formatsAvaible));
-    console.log(`myLog ${JSON.stringify(formatsAvaible)}`);
     
     for (const format of allFormats) {
       let checked:boolean= formatsAvaible.includes(format);
@@ -250,5 +249,19 @@ export class UtilsService {
   }
   sleep(ms:number){
     return new Promise( resolve => setTimeout(resolve, ms) );    
+  }
+  /**
+   * Devuelve los items que estén en los dos arrays
+   *  */
+  innerJoin<T>(array1:T[], array2:T[]):T[]{
+    var array3:T[]=[];
+    
+    for (const i of array1) {
+      if(array2.includes(i)){
+        array3.push(i);
+      }
+    }
+
+    return array3;
   }
 }

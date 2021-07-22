@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  ALL_FORMATS: ["mp3", "m4a", "opus", "ogg", "wav", "aac", "webm"]
 };

@@ -3,6 +3,9 @@
 <ion-content>
   <ion-slides #slides (ionSlideNextStart)="loadPLCover()">
     <ion-slide id="page1">
+      <ion-refresher #refresh slot="fixed" (ionRefresh)="doRefresh($event)" disabled="true" pullMin="60" pullMax="400">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
       <ion-item id="shearchInput">
         <ion-input type="text" [(ngModel)]="filterSong" (ionChange)="highlight()" name="filterSong" [placeholder]="language.search"></ion-input>
         <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -25,8 +28,8 @@
         <p>{{this._language.getActiveLanguage().importingSongs}}</p>
         <ion-progress-bar [color]="this._theme.getColorStr()" type="indeterminate"></ion-progress-bar>
       </div>
-      <ion-list *ngIf="allSongs && allSongs.length>0">
-        <div class="songItem" *ngFor="let song of allSongs | filter:filterSong;index as i">
+      <ion-list *ngIf="songs && songs.length>0">
+        <div class="songItem" *ngFor="let song of songs | filter:filterSong;index as i">
           <ion-label>{{i + 1}}</ion-label>
           <ion-item button (click)="clickSong(song)">
             <ion-label [class]="song==activeSong?'activeSong':'nonActiveSong'">

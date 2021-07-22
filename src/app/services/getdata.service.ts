@@ -6,6 +6,7 @@ import { UtilsService } from './utils.service';
 import { BehaviorSubject } from 'rxjs';
 import { PlayList } from '../interfaces/playList';
 import { LanguageService } from './language.service';
+import { environment } from 'src/environments/environment';
 const { Filesystem } = Plugins;
 
 @Injectable({
@@ -15,40 +16,51 @@ export class GetdataService {
 
   public SDCARD_DIR="";
   public FILESYSTEM_DIR="/storage/emulated/0";
-  public ALLFORMATS=["mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm"];
+  public ALLFORMATS = environment.ALL_FORMATS;
   public formatsSelected:string[]=[];
   $allSongs:BehaviorSubject<Song[]>=new BehaviorSubject<Song[]>([]);
   $allPlayList:BehaviorSubject<PlayList[]>=new BehaviorSubject<PlayList[]>([]);
   
   constructor(private _utils:UtilsService,
-    private _language:LanguageService) { 
-                for(let format of this.ALLFORMATS){
-                  if(JSON.parse(localStorage.getItem(format))){
-                    this.formatsSelected.push(format);
-                  }
-                }
-                if(this.formatsSelected.length == 0){
-                  this.formatsSelected.push("mp4");
-                  this.formatsSelected.push("mp3");
+    private _language:LanguageService) {
+                Filesystem.readdir({path:"/storage"}).then(async (result)=>{
+                  this.SDCARD_DIR = "/storage/"+ result.files.find((f)=>f!="self" && f!="emulated")
+                })
+                
+                var filters:string[] = JSON.parse(localStorage.getItem('filters'));
+
+                if(filters==[]){
+                  this.formatsSelected.push('mp3');
+                  this.formatsSelected.push('m4a');
+                  localStorage.setItem('filters', JSON.stringify(["mp3","m4a"]) );
+                } else {
+                  this.formatsSelected = filters;
                 }
                 this.$allPlayList.next(this.getPlayLists())
               }
   
-  async findSongs(path:string):Promise<Song[]>{
+  async findSongs(path:string):Promise<Song[]>{    
     await Filesystem.readdir({path}).then(async (dir)=>{
-      // /\.[mp3]|[mp4]|[opus]|[ogg]|[wav]|[aac]|[m4a]|[webm]$/
-      
-      var files =dir.files.filter((el)=>{
-        for (const format of this.ALLFORMATS) {
-          return el.endsWith(format);
-        }
+      // /\.[mp3]|[opus]|[ogg]|[wav]|[aac]|[m4a]|[webm]$/
+      var files:string[]=dir.files.filter((f)=>{
+        var result = false;
+        var i=0;
+        while(!result && i < this.ALLFORMATS.length){
+          result = f.endsWith(this.ALLFORMATS[i]);
+          i++;
+        }        
+        return result;
       });
+
+      var allSongsPath:string[] = this.$allSongs.getValue().map((s)=>s.path);
 
       for (const el of files) {
         var win:any=window;
         let songPath:string=win.Ionic.WebView.convertFileSrc(path+"/"+el.replace('%',escape("%")));
-        let song = await this.getSong(songPath)
-        this.addAllSongs( song );
+        if(!allSongsPath.includes(songPath)){
+          let song = await this.getSong(songPath)
+          this.addAllSongs( song );
+        }
       }      
     }).catch((e:Error)=>{
       console.error("ERROR EN DIRECTORIO "+path+"= "+e.message);

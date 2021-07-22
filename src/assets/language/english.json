@@ -52,5 +52,6 @@
     "alertMessageDeleteSong": "Are you sure to delete ${song.title}",
     "songDeletedSuccessfully": "${song.title} deleted successfully",
     "errorDeletingSong": "Error deleting ${song.title}",
-    "details": "Details"
+    "details": "Details",
+    "songDetails":"Song details"
 }

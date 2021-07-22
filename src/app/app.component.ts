@@ -25,7 +25,6 @@ export class AppComponent{
     if(this._utils.isFirstUse()){
       this._language.setLanguage('sp');
       this._theme.setTheme(this._theme.DARK_THEME);
-      localStorage.setItem('filters',JSON.stringify(["mp3","mp4"]));
       this._utils.setToNonFirtUse();
     }else{
       this._language.setLanguage(this._language.getLanguage());

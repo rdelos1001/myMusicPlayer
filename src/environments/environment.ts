@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  ALL_FORMATS: ["mp3", "m4a", "opus", "ogg", "wav", "aac", "webm"]
 };
 
 /*

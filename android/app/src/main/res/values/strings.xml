@@ -3,5 +3,5 @@
     <string name="app_name">RPlayer</string>
     <string name="title_activity_main">RPlayer</string>
     <string name="package_name">in.raul.RPlayer</string>
-    <string name="custom_url_scheme">in.raul.RPlayer</string>
+    <string name="custom_url_scheme">in.raul.rplayer</string>
 </resources>

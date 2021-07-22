@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Song } from 'src/app/interfaces/song';
-import { IonRange, IonSlides, ModalController } from '@ionic/angular';
+import { IonRange, IonRefresher, IonSlides, ModalController } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
@@ -25,7 +25,7 @@ export class SongsPage implements OnInit {
 
   filterSong='';
   orderedBy="";
-  allSongs:Song[]=[];
+  songs:Song[]=[];
   activeSong:Song =null;
   isPlaying:boolean=false;
   isLoading:boolean=false;
@@ -36,8 +36,10 @@ export class SongsPage implements OnInit {
   editPlayListModalActive:boolean=false;
   @ViewChild('volumeRange',{static:false}) volumeRange:ElementRef;
   @ViewChild('progressRange',{static:false}) progressRange:IonRange;
+  @ViewChild('refresh')refresh:IonRefresher;
   @ViewChildren('h2')h2lbls:QueryList<ElementRef>;
   @ViewChildren('p')pLbls:QueryList<ElementRef>;
+
 
   constructor(private _utils:UtilsService,
               private _language:LanguageService,
@@ -54,6 +56,7 @@ export class SongsPage implements OnInit {
   async ngOnInit() {
 
     await this._getData.requestFilesystemPermission();
+    this.isLoading=true;
     this._musicController.$changeSong.subscribe(song=>{
       this.activeSong=song;
       this.isPlaying=this._musicController.player.playing();
@@ -62,8 +65,8 @@ export class SongsPage implements OnInit {
     this._getData.getAllSongs().subscribe((allsongs)=>{
       for (const song of allsongs) {
         const songFormat = song.path.substring(song.path.lastIndexOf('.')+1);
-        if(this._getData.formatsSelected.includes(songFormat) && !this.allSongs.includes(song) ){
-          this.allSongs.push(song);
+        if( !this.songs.includes(song) && this._getData.formatsSelected.includes(songFormat)){
+          this.songs.push(song);
         }
       }
     });
@@ -71,9 +74,12 @@ export class SongsPage implements OnInit {
       this.plList=allPlaylist;
       this.loadPLCover();
     })
-    this.isLoading=true;
-    
-    const localFiles=[
+
+    this._musicController.$isPlaying.subscribe((isPlaying)=>{
+      this.isPlaying=isPlaying;
+    })
+   //Bloque para cargar archivos locales 
+/*     const localFiles=[
       "assets/mp3/ACDC - Highway to Hell.mp3",
       "assets/mp3/oggExample.ogg",
       "assets/mp3/opusExample.opus",
@@ -88,30 +94,36 @@ export class SongsPage implements OnInit {
     for (const f of localFiles) {
       const song=await this._getData.getSong(f);      
       this._getData.addAllSongs(song);
-    }
+    } */
+    //Fin de bloque para archivos locales
+    //Bloque archivos del dispositivo
+    await Filesystem.readdir({path:"/storage"}).then(async (result)=>{ 
 
-/*     var files =(await Filesystem.readdir({path:"/storage"})).files;
-    const SDCARD_DIR="/storage/"+files.find((el)=>el!="self"&&el!="emulated");
-    this._getData.SDCARD_DIR=SDCARD_DIR;
-    
-    let dirs:string[]=[
-      this._getData.FILESYSTEM_DIR+"/Music",
-      this._getData.FILESYSTEM_DIR+"/Download",
-      SDCARD_DIR+"/Music",
-      SDCARD_DIR+"/Download"
-    ];
-    
-    for (const dir of dirs) {      
-      await this._getData.findSongs(dir);
-    };
-     */
+      var files =result.files;
+      const SDCARD_DIR="/storage/"+files.find((el)=>el!="self"&&el!="emulated");
+      
+      let dirs:string[]=[
+        this._getData.FILESYSTEM_DIR+"/Music",
+        this._getData.FILESYSTEM_DIR+"/Download",
+        SDCARD_DIR+"/Music",
+        SDCARD_DIR+"/Download"
+      ];         
+            
+      for (const dir of dirs) {      
+        await this._getData.findSongs(dir);
+      };
 
-    this.loadPLCover();
-    this.allSongs=this._getData.$allSongs.getValue();
-    this.loadFileSystemFilter();
-    this.order("title");
-    this._utils.presentToast( this._language.getActiveLanguage().SongsImported );
-    this.isLoading=false;
+      this.loadPLCover();
+      this.songs=this._getData.$allSongs.getValue();
+      this.loadFileSystemFilter();
+      this.order("title");
+      this._utils.presentToast( this._language.getActiveLanguage().SongsImported );
+      this.refresh.disabled = false;
+      this.isLoading=false;
+    })
+    .catch((reason)=>{
+      console.error(reason);
+    })
   }
   async clickSong(song:Song){
     this._musicController.setPlayList(this._getData.$allSongs.getValue());
@@ -137,7 +149,7 @@ export class SongsPage implements OnInit {
         this.togglePlayer();
       }
       this._getData.delSong(song).then(()=>{
-        this.allSongs.splice( this.allSongs.indexOf(song) );
+        this.songs.splice( this.songs.indexOf(song) );
       });
     }else if(role==="addToPlayList"){
       let role=await this._utils.showAddToPlayListMenu(this._getData.getPlayLists());
@@ -188,28 +200,28 @@ export class SongsPage implements OnInit {
   async order(filter?:string){
     var filter = filter?filter: await this._utils.showOrderMenu();
     if(filter=="title"){
-      this.allSongs.sort((a,b)=>{
+      this.songs.sort((a,b)=>{
         var textA = a.title.toLowerCase();
         var textB = b.title.toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().title;
     }else if(filter=="artist"){
-      this.allSongs.sort((a,b)=>{
+      this.songs.sort((a,b)=>{
         var textA = a.artists[0].toLowerCase();
         var textB = b.artists[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().artist;
     }else if(filter=="genre"){
-      this.allSongs.sort((a,b)=>{
+      this.songs.sort((a,b)=>{
         var textA = a.genres[0].toLowerCase();
         var textB = b.genres[0].toLowerCase();
         return (textA>textB)?1: (textB>textA)?-1:0
       });
       this.orderedBy=this._language.getActiveLanguage().genre;
     }
-    this._musicController.setPlayList(this.allSongs);
+    this._musicController.setPlayList(this.songs);
   }
   async updateProgress(){    
     if(this.isPlaying){
@@ -265,14 +277,14 @@ export class SongsPage implements OnInit {
     formatsSelected = await this._utils.filterAlerts( this._language.getActiveLanguage().audioFormat );
     //"mp3", "mp4", "opus", "ogg", "wav", "aac", "m4a", "webm";
     var newPlayList:Song[]=[];
-    if(formatsSelected){
+    if(formatsSelected!=null && formatsSelected.length>0){
       for (const format of allFormats) {
         if(formatsSelected.includes(format)){
           newPlayList.push(...this._getData.$allSongs.getValue().filter((s)=>s.path.endsWith(format)))
         }
       }
       localStorage.setItem('filters',JSON.stringify(formatsSelected))
-      this.allSongs=newPlayList;
+      this.songs=newPlayList;
     }
   }
   loadFileSystemFilter(){
@@ -329,5 +341,22 @@ export class SongsPage implements OnInit {
       this.statusBar.backgroundColorByHexString('#ff6347');
     }
     this.editPlayListModalActive = false;
+  }
+  async doRefresh(event:any){
+    let dirs:string[]=[
+      this._getData.FILESYSTEM_DIR+"/Music",
+      this._getData.FILESYSTEM_DIR+"/Download",
+      this._getData.SDCARD_DIR+"/Music",
+      this._getData.SDCARD_DIR+"/Download"
+    ];
+    
+    for (const dir of dirs) {      
+      await this._getData.findSongs(dir);
+    };
+
+    this.order("title");
+    this._utils.presentToast( this._language.getActiveLanguage().SongsImported );
+  
+    event.target.complete();
   }
 }

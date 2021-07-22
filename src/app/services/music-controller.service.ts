@@ -15,6 +15,7 @@ export class MusicControllerService {
   public player:Howl= null;
   $changeSong:EventEmitter<Song>= new EventEmitter<Song>();
   $playList:BehaviorSubject<Song[]>=new BehaviorSubject<Song[]>([]);
+  $isPlaying:EventEmitter<boolean> = new EventEmitter<boolean>();
 
   progress=0;
   mod:number=1;
@@ -35,6 +36,9 @@ export class MusicControllerService {
               private _utils:UtilsService,
               private _language:LanguageService) {
                 this.language=this._language.getActiveLanguage();
+                this.$isPlaying.subscribe((v)=>{
+                  this.musicControls.updateIsPlaying(v)
+                })
   }
   start(song:Song):Promise<Song>{    
     return new Promise<Song>((resolve)=>{
@@ -53,7 +57,7 @@ export class MusicControllerService {
           this.next();
         }
       })
-      this.player.play();
+      this.togglePlayer()
       this.totalTime= this.getTime(this.player.duration());
       this.createMusicControls(song);
     })
@@ -130,7 +134,7 @@ export class MusicControllerService {
     this.musicControls.create({
       track       : song.title,		// optional, default : ''
       artist      ,						// optional, default : ''
-      cover       : 'icon/icon.png',		// optional, default : nothing
+      cover       : '/assets/icon/icon.png',		// optional, default : nothing
       // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
       //			 or a remote url ('http://...', 'https://...', 'ftp://...')
       isPlaying   : true,			// optional, default : true
@@ -161,12 +165,12 @@ export class MusicControllerService {
             break;
           case 'music-controls-pause':
             // Do something
-            this.player.pause();
-            this.musicControls.updateIsPlaying(false);
+            this.togglePlayer();
+            this.musicControls.updateIsPlaying(this.player.playing());
             break;
           case 'music-controls-play':
-              this.player.play();
-              this.musicControls.updateIsPlaying(true);
+            this.togglePlayer();
+            this.musicControls.updateIsPlaying(this.player.playing());
             break;
           case 'music-controls-destroy':
             // Do something
@@ -188,6 +192,7 @@ export class MusicControllerService {
     }else{
       this.player.play();
     }
+    this.$isPlaying.emit(this.player.playing());
   }
   setMod(mod:number):number{
     this.mod=mod;

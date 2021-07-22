@@ -26,10 +26,7 @@ export class SongDetailsComponent implements OnInit {
 
   ngOnInit() {
     musicMetadata.fetchFromUrl(this.song.path,{skipPostHeaders:true}).then((metadata)=>{
-      this.songCovers = metadata.common.picture
-      console.log(`myLog ${this.songCovers.length}`);
-      console.log(this.songCovers);
-      
+      this.songCovers = metadata.common.picture      
       this.loadingCover=false;
     })
   }

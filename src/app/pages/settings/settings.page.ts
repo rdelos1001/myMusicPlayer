@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { LanguageService } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
+import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-settings',
@@ -14,7 +15,8 @@ export class SettingsPage implements OnInit {
   constructor(private appVersion:AppVersion,
               private _language:LanguageService,
               private router:Router,
-              private _theme:ThemeService) { }
+              private _theme:ThemeService,
+              private _utils:UtilsService) { }
   version:string;
   languageValue:string;
   themeValue:string;
@@ -41,5 +43,8 @@ export class SettingsPage implements OnInit {
       this._language.setLanguage(this._language.ENGLISH);
     }
     //this.language=this._language.getActiveLanguage().settingsPage;
+  }
+  showWelcomeAlert(){
+    this._utils.showWelcomeAlert();
   }
 }

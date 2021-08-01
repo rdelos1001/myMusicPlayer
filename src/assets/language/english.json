@@ -53,5 +53,8 @@
     "songDeletedSuccessfully": "${song.title} deleted successfully",
     "errorDeletingSong": "Error deleting ${song.title}",
     "details": "Details",
-    "songDetails":"Song details"
+    "songDetails":"Song details",
+    "RPlayerWillShearchInFolder":"RPlayer will search in this folders",
+    "seeMore":"See more",
+    "wellcome":"Wellcome"
 }

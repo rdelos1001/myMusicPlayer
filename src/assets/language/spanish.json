@@ -53,5 +53,8 @@
     "songDeletedSuccessfully": "Canción ${song.title} eliminada",
     "errorDeletingSong": "Error eliminando ${song.title}",
     "details": "Detalles",
-    "songDetails":"Detalles de canción"
+    "songDetails":"Detalles de canción",
+    "RPlayerWillShearchInFolder":"RPlayer buscará canciones en las carpetas",
+    "seeMore":"Ver más",
+    "wellcome":"Bienvenido"
 }

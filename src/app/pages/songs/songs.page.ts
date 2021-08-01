@@ -55,14 +55,7 @@ export class SongsPage implements OnInit {
     await this._getData.requestFilesystemPermission();
     
     if(this._utils.isFirstUse()){      
-      this._utils.presentAlert('Bienvenido',
-                              `RPlayer buscará canciones en las carpetas<br>
-                              <ul style='margin:0; margin-top:1pc'>
-                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Music</b></li>
-                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Download</b></li>
-                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Download</b></li>
-                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Music</b></li>
-                              </ul>`)
+      this._utils.showWelcomeAlert();
       this._utils.setToNonFirtUse();
     }
 

@@ -247,6 +247,21 @@ export class UtilsService {
       return null;
     }
   }
+
+  showWelcomeAlert() {
+    const wellcomeLbl= this._language.getActiveLanguage().wellcome
+    const searchLbl= this._language.getActiveLanguage().RPlayerWillShearchInFolder
+
+    this.presentAlert(wellcomeLbl,
+                              `${searchLbl}<br>
+                              <ul style='margin:0; margin-top:1pc'>
+                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Music</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Download</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Download</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Music</b></li>
+                              </ul>`)
+  }
+
   sleep(ms:number){
     return new Promise( resolve => setTimeout(resolve, ms) );    
   }

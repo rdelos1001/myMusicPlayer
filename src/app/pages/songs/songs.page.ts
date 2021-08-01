@@ -10,11 +10,9 @@ import { GetdataService } from 'src/app/services/getdata.service';
 import { PlayList } from 'src/app/interfaces/PlayList';
 import * as musicMetadata from 'music-metadata-browser';
 import { ViewEditPlaylistComponent } from 'src/app/components/view-edit-playlist/view-edit-playlist.component';
-import { Plugins } from '@capacitor/core';
 import { SongDetailsComponent } from 'src/app/components/song-details/song-details.component';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-
-const { Filesystem } = Plugins;
+import { Filesystem } from '@capacitor/filesystem';
 
 @Component({
   selector: 'app-songs',
@@ -54,8 +52,20 @@ export class SongsPage implements OnInit {
     this.language= this.language.id!=this._language.getActiveLanguage()?this._language.getActiveLanguage():this.language
   }
   async ngOnInit() {
-
     await this._getData.requestFilesystemPermission();
+    
+    if(this._utils.isFirstUse()){      
+      this._utils.presentAlert('Bienvenido',
+                              `RPlayer buscará canciones en las carpetas<br>
+                              <ul style='margin:0; margin-top:1pc'>
+                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Music</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>/storage/emulated/0/Download</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Download</b></li>
+                                <li style = 'margin-top: 0.5pc;' ><b>SD_CARD/Music</b></li>
+                              </ul>`)
+      this._utils.setToNonFirtUse();
+    }
+
     this.isLoading=true;
     this._musicController.$changeSong.subscribe(song=>{
       this.activeSong=song;

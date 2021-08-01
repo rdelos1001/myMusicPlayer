@@ -7,19 +7,19 @@ import { Song } from '../interfaces/song';
 export class FilterPipe implements PipeTransform {
 
   transform(value:Song[], arg: string):Song[] {
-    var resultSongs:Set<Song>= new Set<Song>();
+    var resultSongs:Song[]=[]
     if(!arg){
       return value;
     }
     
     for (const song of value) {
       if(song.title.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-        resultSongs.add(song);
+        resultSongs.push(song);
       }else{
         if(song.artists){
           song.artists.forEach((artist)=>{
             if(artist.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-              resultSongs.add(song);
+              resultSongs.push(song);
             }
           })
         }
@@ -27,13 +27,13 @@ export class FilterPipe implements PipeTransform {
         if(song.genres){
           song.genres.forEach((genres)=>{
             if(genres.toLocaleLowerCase().indexOf(arg.toLocaleLowerCase()) > -1){
-              resultSongs.add(song);
+              resultSongs.push(song);
             }
           })
         }
       };
     };
-    return Array.from(resultSongs);
+    return resultSongs;
   };
 
 }

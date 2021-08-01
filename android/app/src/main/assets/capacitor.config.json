@@ -1,22 +1,22 @@
 {
-  "appId": "in.raul.RPlayer",
-  "appName": "RPlayer",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "www",
-  "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 0
-    }
-  },
-  "cordova": {},
-  "server": {
-    "plugins": {
-      "LocalNotifications": {
-        "smallIcon": "ic_stat_audiotrack",
-        "iconColor": "#00FF00",
-        "sound": "smb_jump-super.wav"
-      }
-    }
-  }
+	"appId": "in.raul.RPlayer",
+	"appName": "RPlayer",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "www",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0
+		}
+	},
+	"cordova": {},
+	"server": {
+		"plugins": {
+			"LocalNotifications": {
+				"smallIcon": "ic_stat_audiotrack",
+				"iconColor": "#00FF00",
+				"sound": "smb_jump-super.wav"
+			}
+		}
+	}
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Plugins } from '@capacitor/core';
 import { Song } from '../interfaces/song';
 import * as musicMetadata from 'music-metadata-browser';
 import { UtilsService } from './utils.service';
@@ -7,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { PlayList } from '../interfaces/playList';
 import { LanguageService } from './language.service';
 import { environment } from 'src/environments/environment';
-const { Filesystem } = Plugins;
+import { Filesystem } from '@capacitor/filesystem';
 
 @Injectable({
   providedIn: 'root'
@@ -100,8 +99,9 @@ export class GetdataService {
     return song
   }
   async requestFilesystemPermission(){
-    return new Promise<boolean>(async (resolve)=>{
-      await Filesystem.requestPermissions();
+    return new Promise<boolean>(async (resolve,reject)=>{
+      var result = await Filesystem.requestPermissions();
+      console.log("MyLog "+JSON.stringify(result));
       resolve(true)
     })
   }
